@@ -1,9 +1,8 @@
-# Funzionamento  e struttura del motore
+# Funzionamento del motore
 
 ## Idea di base
 Il motore di gioco orchestra tutte le interazioni del gioco e modifica in modo appropriato tutti i parametri del gioco.
-Ad una nuova campagna il motore viene inizializzato con un **context** che comprende tutto sulla campagna (località, **npc_character**, etc..) e i **pc_character**. Il motore fa interagire i diversi elementi della campagna, mantiene in memoria tutte le operazioni svolte e aggiorna di volta in volta lo stato.
-L'oggetto **State** contiene dunque le informazioni dello stato attuali.
+Ad una nuova campagna il motore viene inizializzato con un **context** che comprende tutto sulla campagna (località, **npc_character**, etc..) e i **pc_character**. Il motore fa interagire i diversi elementi della campagna, mantiene in memoria tutte le operazioni svolte e aggiorna lo stato di volta in volta.
 
 In Pathfinder 2e ci sono 3 modalità di gioco:
  * *Encounter Mode*: modalità per combattimenti.
@@ -16,12 +15,10 @@ In Pathfinder 2e ci sono 3 modalità di gioco:
  * *current_time*: indica il tempo attuale.
  * *game_mode*: indica una delle 3 modalità di gioco menzionate sopra.
   * il *game_mode* Encounter sarà un oggetto a se stante in cui gestire il combattimento.
- * *pc_charachters*: la lista dei personaggi giocanti nella scena di gioco.
-    * ogni *pc_charachter* oltre alla sua definizione completa 
- * *npc_characters*: lista dei personaggi non giocanti nella scena di gioco.
-    * ogni npc_characters contiene la sua definizione e il suo *behaviour* (utilizzabile dall'IA per simulare l'npc) e mantiene un log delle conversazioni.
- * *context*: un oggetto che rappresenta la contesto in cui si svolge la parte di gioco attuale (griglia, edifici, elementi di natura, oggetti, contesto dell'avventura)
+ * *actual_scene*: l'oggetto **scene** conterrà tutto ciò che riguarda l'ambiente e gli npc inclusi nella scena.
 
+
+ 
  Il motore di gioco lavora diversamente a seconda del *game_mode*. 
  
  ## Exploration Mode
@@ -30,4 +27,18 @@ In Pathfinder 2e ci sono 3 modalità di gioco:
 
 ### Conversational Layer
 
-l'oggetto **npc_character** ha un metodo *to_speak(**pc_character**,**what**)*. Il metodo viene invocato ogniqualvolta un pc desidera parlare con un npc. inoltre possiede un oggetto *Hashmap*<String pc_name,**conversation_log**> dove sono memorizzati i log delle conversazioni. **conversation_log** è un oggetto che ha diversi metodi e utility per estrarre la conversazione. **npc_character** possiede anche un **actual_contest** che viene aggiornato di volta in volta. Ad esempio se l'npc cambia località (da una taverna in una foresta) allora l'**actual_contest** viene aggiornato. Durante, l'inizializzazione del motore di gioco, una descrizione testuale del **context** di gioco viene aggiunta all'**actual_contest** dell'npc.
+l'oggetto **npc_character** ha un metodo *to_speak(**pc_character**,**what**)*. Il metodo viene invocato ogniqualvolta un pc desidera parlare con un npc. inoltre possiede un oggetto *Hashmap*<String pc_name,**conversation_log**> dove sono memorizzati i log delle conversazioni. **conversation_log** è un oggetto che ha diversi metodi e utility per estrarre la conversazione. **npc_character** possiede informazioni sulla località in cui è presente e un **private_context** che viene aggiornato di volta in volta. Ad esempio se l'npc cambia località (da una taverna in una foresta) allora il **private_context** viene aggiornato (conterrà per esempio, il motivo per cui si è spostato). Durante, l'inizializzazione del motore di gioco, una descrizione del **context** di gioco viene aggiunta all'**private_context** dell'npc. 
+
+# Struttura del motore, di pc_character e di npc_character
+
+## Motore
+Il motore ha come campi:
+
+* lista di *npc_character*
+* lista di *pc_character*
+* *context* generale di gioco
+* *state*: lo stato attuale.
+* *scenes*: una lista delle scene della campagna.
+* *log*: un log di ogni singola cosa succede durante la campagna.
+
+Piccola anticipazione: sarà l'AI a utilizzare questo motore (openAPI function calls);
