@@ -29,9 +29,9 @@ In Pathfinder 2e ci sono 3 modalità di gioco:
 
 l'oggetto **npc_character** ha un metodo *to_speak(**pc_character**,**what**)*. Il metodo viene invocato ogniqualvolta un pc desidera parlare con un npc. inoltre possiede un oggetto *Hashmap*<String pc_name,**conversation_log**> dove sono memorizzati i log delle conversazioni. **conversation_log** è un oggetto che ha diversi metodi e utility per estrarre la conversazione. **npc_character** possiede informazioni sulla località in cui è presente e un **private_context** che viene aggiornato di volta in volta. Ad esempio se l'npc cambia località (da una taverna in una foresta) allora il **private_context** viene aggiornato (conterrà per esempio, il motivo per cui si è spostato). Durante, l'inizializzazione del motore di gioco, una descrizione del **context** di gioco viene aggiunta all'**private_context** dell'npc. 
 
-# Struttura del motore, di pc_character e di npc_character
+# Struttura del motore, di pc_character e di npc_character e altro
 
-## Motore
+## Campaign_engine
 Il motore ha come campi:
 
 * lista di *npc_character*
@@ -50,7 +50,45 @@ Il motore ha come metodi i soliti getters and setters. inoltre ha i metodi:
 * *create_npc_character(npc_character_info)*: crea un nuovo npc
 * *create_context(context_info)*: crea e imposta un contesto
 * *create_scene(scene_info)*: crea una scena e la carica nella lista di scene;
-* *update_state()*: fa l'update dello stato
-* *initializeAI(Api_key)*: inizializza la classe AI e imposta l'ApiKey (necessaria per utilizzare Openai).
+* *initializeAI(Api_key)*: inizializza la classe AI e imposta l'ApiKey (necessaria per utilizzare Openai) (al momento hardcoded per semplicità)
 
-Inoltre per ogni singola azione possibile immaginabile nel gioco, esiste un metodo. Al momento vogliamo implementare l'azione *speak*
+Inoltre per ogni singola azione possibile immaginabile nel gioco, esiste un metodo che si occuperà tra l'altro di fare l'update dello stato. Al momento vogliamo implementare l'azione *speak*.
+
+## Pc_character
+
+Pc_character ha come campi:
+
+* *name*
+* *phisical_description*
+
+soliti getters and setter
+
+## Npc_character
+
+Npc_character ha come campi:
+
+* *private_context*: tutto ciò che riguarda lui e la sua situazione attuale.
+* *map<pc_name,Conversation_log>*: memoria delle conversazioni.
+* *Campaign_engine* riferimento al motore
+
+oltre ai soliti getters and setter ha
+
+* change_scene(scene): aggiorna il *private_context* e aggiunge se stesso alla *Lista npc_character* della scena.
+
+*  String to_speak(pc_name,what): invoca l'ai, e ritorna la risposta dell'npc
+
+## Conversation_log
+
+ha come campi:
+
+* *Hashmap<String c_name,Message>[]*: un array di messaggi
+
+soliti getters e setters.
+
+## Scene
+
+L'oggetto scene contiene:
+
+* *Lista pc_character*
+* *Lista npc_character*
+* *scene_description*
