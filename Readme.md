@@ -15,7 +15,7 @@ In Pathfinder 2e ci sono 3 modalità di gioco:
  * *current_time*: indica il tempo attuale.
  * *game_mode*: indica una delle 3 modalità di gioco menzionate sopra.
   * il *game_mode* Encounter sarà un oggetto a se stante in cui gestire il combattimento.
- * *actual_scene*: l'oggetto **scene** conterrà tutto ciò che riguarda l'ambiente e gli npc inclusi nella scena.
+ * *actual_scene*: l'oggetto **scene** conterrà tutto ciò che riguarda l'ambiente, i pc e gli npc inclusi nella scena.
 
 
  
@@ -38,7 +38,19 @@ Il motore ha come campi:
 * lista di *pc_character*
 * *context* generale di gioco
 * *state*: lo stato attuale.
-* *scenes*: una lista delle scene della campagna.
-* *log*: un log di ogni singola cosa succede durante la campagna.
+* lista di *scene*: una lista delle scene della campagna.
+* *Logger*: un log di ogni singola cosa succede durante la campagna.
+* *AI* : un oggetto che ha tutto quello che serve per interpellare l'AI
 
 Piccola anticipazione: sarà l'AI a utilizzare questo motore (openAPI function calls);
+
+Il motore ha come metodi i soliti getters and setters. inoltre ha i metodi:
+
+* *create_pc_character(pc_character_info)*: crea un nuovo pc
+* *create_npc_character(npc_character_info)*: crea un nuovo npc
+* *create_context(context_info)*: crea e imposta un contesto
+* *create_scene(scene_info)*: crea una scena e la carica nella lista di scene;
+* *update_state()*: fa l'update dello stato
+* *initializeAI(Api_key)*: inizializza la classe AI e imposta l'ApiKey (necessaria per utilizzare Openai).
+
+Inoltre per ogni singola azione possibile immaginabile nel gioco, esiste un metodo. Al momento vogliamo implementare l'azione *speak*
