@@ -2,6 +2,8 @@ package com.posilcorp;
 
 import java.util.HashMap;
 
+import com.posilcorp.OpenAI.NpcIAOpenAi;
+
 public class Campaign_Engine {
     private String campaign_name;
     private HashMap<String,Pc_character> pcs;

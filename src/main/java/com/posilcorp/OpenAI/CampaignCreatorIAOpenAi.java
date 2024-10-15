@@ -1,4 +1,4 @@
-package com.posilcorp;
+package com.posilcorp.OpenAI;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,7 +13,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CampaignCreatorIAOpenAi {
+import com.posilcorp.CampaignCreatorIAInterface;
+import com.posilcorp.Campaign_Engine;
+
+public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface{
     private final String url = "https://api.openai.com/v1/chat/completions";
     private final String api_Token = "Bearer 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";
 
@@ -44,7 +47,7 @@ public class CampaignCreatorIAOpenAi {
                 +
                 "4. createNpc(String description, String scene_name) per creare un personaggio non giocante, specificando la sua descrizione e la scena in cui appare.\n\n"
                 +
-                "Guiderai l'utente passo per passo nel fornire queste informazioni, assicurandoti che ogni funzione sia invocata correttamente per costruire la campagna.";
+                "Guiderai l'utente passo per passo nel fornire queste informazioni, assicurandoti che ogni funzione sia invocata correttamente per costruire la campagna. Al termine della creazione, inviterai l'utente a premere il bottone 'TERMINA CREAZIONE CAMPAGNA'";
                 conversation.put(new JSONObject().put("role", "system").put("content", system_instructions));
 
         String setCampaignName = "{\n" +
@@ -164,7 +167,7 @@ public class CampaignCreatorIAOpenAi {
 
     }
 
-    public String tellGPT(String message) {
+    public String interact(String message) {
         JSONArray conversation_aux = conversation;
 
         if(message!=null) data.put("messages", conversation.put(new JSONObject().put("role", "user").put("content", message)));
@@ -181,7 +184,6 @@ public class CampaignCreatorIAOpenAi {
         try {
             tool_calls = response.getJSONArray("tool_calls");
         } catch (JSONException e) {
-            e.printStackTrace();
         }
         if (tool_calls != null) {
             tool_calls.forEach(item -> {
@@ -206,16 +208,26 @@ public class CampaignCreatorIAOpenAi {
                                 arguments[i] = parameters[i].getType()
                                         .cast(arguments_json.get(parameters[i].getName()));
                             }
-                            method.invoke(this, arguments);
-                            conversation.put(new JSONObject().put("role", "tool")
+                            try{
+                                method.invoke(this, arguments);
+                                conversation.put(new JSONObject().put("role", "tool")
                                     .put("content", "status: ok")
                                     .put("tool_call_id", tool_call.getString("id")));
+                            }catch(Exception e)
+                            {
+                                e.printStackTrace();
+                                conversation.put(new JSONObject().put("role", "tool")
+                                    .put("content", "status: Errore, riprovare!")
+                                    .put("tool_call_id", tool_call.getString("id")));
+                            }
+                            
+                            
                             response = performAPICall();
                         }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    response=new JSONObject().put("content", "non sono riuscito a perfezionare la creazione!").put("role", "assistanti");
+                    response=new JSONObject().put("content", "non sono riuscito a perfezionare la creazione!").put("role", "assistant");
                 }
             });
             conversation.put(response);
@@ -235,7 +247,7 @@ public class CampaignCreatorIAOpenAi {
         campaign_Engine.create_Pc(name, physical_description);
     }
 
-    public void createNpc(String description, String scene_name) {
+    public void createNpc(String description, String scene_name) throws Exception {
         campaign_Engine.create_npc(description, scene_name);
     }
 

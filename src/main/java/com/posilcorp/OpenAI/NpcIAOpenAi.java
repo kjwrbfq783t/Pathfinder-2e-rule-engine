@@ -1,7 +1,10 @@
-package com.posilcorp;
+package com.posilcorp.OpenAI;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.posilcorp.NpcIAInterface;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
