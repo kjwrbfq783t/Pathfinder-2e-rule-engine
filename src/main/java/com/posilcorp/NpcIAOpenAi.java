@@ -11,20 +11,21 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 
-public class NpcIA extends NpcIaAbstract {
+public class NpcIA implements NpcIAInterface {
     private JSONArray conversation;
     private JSONObject system_instruction;
     private String description;
-    private final String api_token = "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";
+    private String api_token;
 
-    public NpcIA(String description, String scene_description) {
-        super(description,scene_description);
+    @Override
+    public void load_initialConf(String description, String scene_description) {
         this.description=description;
         this.system_instruction= new JSONObject().put("role", "system").put("content", description
                 + ". Attualmente ti trovi nella seguente località: " + scene_description);
         this.conversation=new JSONArray();
+        
     }
-
+        
     @Override
     public String speak_to(String name, String text) throws MalformedURLException, IOException {
         String url = "https://api.openai.com/v1/chat/completions";
@@ -51,11 +52,16 @@ public class NpcIA extends NpcIaAbstract {
         conversation.put(new JSONObject().put("role", "assistant").put("content", response));
         return response;
     }
-    
+
     @Override
     public void updateScene(String scene_description) {
         system_instruction= new JSONObject().put("role", "system").put("content", description
                 + ". Attualmente ti trovi nella seguente località: " + scene_description);
 
+    }
+
+    @Override
+    public void initialize(String apiToken) throws Exception {
+        api_token=apiToken;
     }
 }

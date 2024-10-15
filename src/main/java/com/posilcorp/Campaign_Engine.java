@@ -8,6 +8,7 @@ public class Campaign_Engine {
     private HashMap<String,Npc_character> npcs;
     private HashMap<String,Scene> scene_list;
     private Scene actual_scene;
+    NpcIAInterface npc_intelligence;
 
     public Scene getActual_scene() {
         return actual_scene;
@@ -17,11 +18,13 @@ public class Campaign_Engine {
         return campaign_name;
     }
 
-    public Campaign_Engine(String campaign_name) {
+    public Campaign_Engine(String campaign_name) throws Exception {
         this.pcs = new HashMap<String,Pc_character>();
         this.npcs = new HashMap<String,Npc_character>();
         this.scene_list = new HashMap<String,Scene>();
         this.campaign_name=campaign_name;
+        this.npc_intelligence=new NpcIAOpenAi();
+        npc_intelligence.initialize("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");
     }
 
     public String create_Pc(String name, String phisical_description){
@@ -30,7 +33,7 @@ public class Campaign_Engine {
     }
 
     public String create_npcs(String description,Scene scene_is_on){
-        npcs.put("name", new Npc_character(description, this, scene_is_on));
+        npcs.put("name", new Npc_character(description,scene_is_on,npc_intelligence));
         return "";
     }
 

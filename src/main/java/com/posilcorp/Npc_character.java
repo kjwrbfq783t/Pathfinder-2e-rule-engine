@@ -6,16 +6,15 @@ public class Npc_character {
 
     
     public Scene scene_is_on;
-    public NpcIaAbstract intelligence;
+    public NpcIAInterface intelligence;
     public String description;
 
 
-    public Npc_character(String description,
-            Campaign_Engine campaign_Engine, Scene scene_is_on) {
+    public Npc_character(String description,Scene scene_is_on,NpcIAInterface intelligence) {
 
         this.scene_is_on = scene_is_on;
         this.description=description;
-        this.intelligence=new NpcIA(description,scene_is_on.getDescription());
+        intelligence.load_initialConf(description, scene_is_on.getDescription());
     }
 
     public String speak_to(String name,String text){
