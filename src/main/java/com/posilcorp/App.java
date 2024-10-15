@@ -10,7 +10,9 @@ public class App
          try {
            String botToken = "7957732855:AAFRFb6x5XxgfaT1837wRg_ZDYaS4xky5xY";
            TelegramBotsLongPollingApplication botsApplication = new TelegramBotsLongPollingApplication();
-           botsApplication.registerBot(botToken, new DungeonMaster());
+           DungeonMaster myBot=new DungeonMaster();
+           botsApplication.registerBot(botToken,myBot);
+           myBot.registerCommands();
        } catch (TelegramApiException e) {
            e.printStackTrace();
        }

@@ -11,11 +11,12 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 
-public class NpcIA implements NpcIAInterface {
+public class NpcIAOpenAi implements NpcIAInterface {
     private JSONArray conversation;
     private JSONObject system_instruction;
     private String description;
-    private String api_token;
+    private final String api_token = "Bearer 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";
+
 
     @Override
     public void load_initialConf(String description, String scene_description) {
@@ -60,8 +61,4 @@ public class NpcIA implements NpcIAInterface {
 
     }
 
-    @Override
-    public void initialize(String apiToken) throws Exception {
-        api_token=apiToken;
-    }
 }

@@ -4,7 +4,6 @@ public interface NpcIAInterface{
 
 
 
-    public void initialize(String apiToken) throws Exception;
 
     public void load_initialConf(String description,String scene_description);
 
