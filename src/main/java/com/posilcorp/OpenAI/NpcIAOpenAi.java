@@ -18,14 +18,17 @@ public class NpcIAOpenAi implements NpcIAInterface {
     private JSONArray conversation;
     private JSONObject system_instruction;
     private String description;
+    private String scene_description;
     private final String api_token = "Bearer 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";
 
 
     @Override
-    public void load_initialConf(String description, String scene_description) {
+    public void load_initialConf(String description, String scene_description,String scene_name) {
         this.description=description;
+        this.scene_description=scene_description;
         this.system_instruction= new JSONObject().put("role", "system").put("content", description
-                + ". Attualmente ti trovi nella seguente località: " + scene_description);
+                + "Di seguito il log delle tue posizioni nella mappa, il più recente è quello più in basso:"
+                +"->"+scene_name+": "+ scene_description+"\n");
         this.conversation=new JSONArray();
         
     }
@@ -58,9 +61,9 @@ public class NpcIAOpenAi implements NpcIAInterface {
     }
 
     @Override
-    public void updateScene(String scene_description) {
-        system_instruction= new JSONObject().put("role", "system").put("content", description
-                + ". Attualmente ti trovi nella seguente località: " + scene_description);
+    public void updateScene(String scene_description,String scene_name) {
+        String updated_text=system_instruction.getString("content")+"->"+scene_name+": "+ scene_description+"\n";
+        system_instruction.put("role", "system").put("content", updated_text);
 
     }
 

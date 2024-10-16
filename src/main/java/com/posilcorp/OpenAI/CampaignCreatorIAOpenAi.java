@@ -16,7 +16,12 @@ import org.json.JSONObject;
 import com.posilcorp.CampaignCreatorIAInterface;
 import com.posilcorp.Campaign_Engine;
 
-public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface{
+public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface {
+
+    public Campaign_Engine getCampaign_Engine() {
+        return campaign_Engine;
+    }
+
     private final String url = "https://api.openai.com/v1/chat/completions";
     private final String api_Token = "Bearer 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";
 
@@ -43,12 +48,13 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface{
                 +
                 "1. setCampaignName(String campaign_name) per impostare il nome della campagna.\n" +
                 "2. createScene(String name, String description) per creare una scena con nome e descrizione.\n" +
-                "3. createPc(String name, String phisical_description) per creare un personaggio giocante con nome e descrizione fisica.\n"
+                "3. createPc(String name, String phisical_description,String scene_name) per creare un personaggio giocante. il campo 'name' va riempito con il nome dell'user.\n"
                 +
                 "4. createNpc(String description, String scene_name) per creare un personaggio non giocante, specificando la sua descrizione e la scena in cui appare.\n\n"
                 +
-                "Guiderai l'utente passo per passo nel fornire queste informazioni, assicurandoti che ogni funzione sia invocata correttamente per costruire la campagna. Al termine della creazione, inviterai l'utente a premere il bottone 'TERMINA CREAZIONE CAMPAGNA'";
-                conversation.put(new JSONObject().put("role", "system").put("content", system_instructions));
+                "Guiderai l'utente passo per passo nel fornire queste informazioni, assicurandoti che ogni funzione sia invocata correttamente per costruire la campagna. Al termine della creazione, inviterai l'utente a premere il bottone 'TERMINA CREAZIONE CAMPAGNA'"
+                + " I messaggi sono accompagnati dal nome dell'user che li invia.";
+        conversation.put(new JSONObject().put("role", "system").put("content", system_instructions));
 
         String setCampaignName = "{\n" +
                 "  \"type\": \"function\",\n" +
@@ -96,20 +102,25 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface{
                 "  \"type\": \"function\",\n" +
                 "  \"function\": {\n" +
                 "    \"name\": \"createPc\",\n" +
-                "    \"description\": \"Crea un personaggio giocante con nome e descrizione fisica.\",\n" +
+                "    \"description\": \"Crea un personaggio giocante specificando  descrizione fisica e scena iniziale.\",\n"
+                +
                 "    \"parameters\": {\n" +
                 "      \"type\": \"object\",\n" +
                 "      \"properties\": {\n" +
                 "        \"name\": {\n" +
                 "          \"type\": \"string\",\n" +
-                "          \"description\": \"Il nome del personaggio giocante.\"\n" +
+                "          \"description\": \"Il nome dell'user che ha invocato la creazione.\"\n" +
                 "        },\n" +
                 "        \"physical_description\": {\n" +
                 "          \"type\": \"string\",\n" +
                 "          \"description\": \"Descrizione fisica del personaggio.\"\n" +
+                "        },\n" +
+                "        \"scene_name\": {\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"description\": \"Il nome della scena in cui il personaggio si trova.\"\n" +
                 "        }\n" +
                 "      },\n" +
-                "      \"required\": [\"name\", \"physical_description\"],\n" +
+                "      \"required\": [\"name\", \"physical_description\", \"scene_name\"],\n" +
                 "      \"additionalProperties\": false\n" +
                 "    }\n" +
                 "  }\n" +
@@ -119,10 +130,15 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface{
                 "  \"type\": \"function\",\n" +
                 "  \"function\": {\n" +
                 "    \"name\": \"createNpc\",\n" +
-                "    \"description\": \"Crea un personaggio non giocante con descrizione e scena associata.\",\n" +
+                "    \"description\": \"Crea un personaggio non giocante con nome, descrizione e scena in cui vuole iniziare.\",\n"
+                +
                 "    \"parameters\": {\n" +
                 "      \"type\": \"object\",\n" +
                 "      \"properties\": {\n" +
+                "        \"name\": {\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"description\": \"Il nome del personaggio non giocante.\"\n" +
+                "        },\n" +
                 "        \"description\": {\n" +
                 "          \"type\": \"string\",\n" +
                 "          \"description\": \"Descrizione del personaggio non giocante.\"\n" +
@@ -132,11 +148,12 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface{
                 "          \"description\": \"Nome della scena in cui appare.\"\n" +
                 "        }\n" +
                 "      },\n" +
-                "      \"required\": [\"description\", \"scene_name\"],\n" +
+                "      \"required\": [\"name\", \"description\", \"scene_name\"],\n" +
                 "      \"additionalProperties\": false\n" +
                 "    }\n" +
                 "  }\n" +
                 "}";
+
         JSONObject createNpc_json = new JSONObject(createNpc);
         JSONObject createPc_json = new JSONObject(createPc);
         JSONObject createScene_json = new JSONObject(createScene);
@@ -156,7 +173,7 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface{
         con.setRequestProperty("Content-Type", "application/json");
         con.setRequestProperty("Authorization",
                 api_Token);
-                data.put("messages", conversation);
+        data.put("messages", conversation);
         con.setDoOutput(true);
         con.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
         BufferedReader buff = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
@@ -167,10 +184,12 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface{
 
     }
 
-    public String interact(String message) {
+    public String interact(String name, String message) {
         JSONArray conversation_aux = conversation;
 
-        if(message!=null) data.put("messages", conversation.put(new JSONObject().put("role", "user").put("content", message)));
+        if (message != null)
+            data.put("messages",
+                    conversation.put(new JSONObject().put("role", "user").put("content", name + ": " + message)));
 
         try {
             response = performAPICall();
@@ -187,8 +206,8 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface{
         }
         if (tool_calls != null) {
             tool_calls.forEach(item -> {
+                JSONObject tool_call = (JSONObject) item;
                 try {
-                    JSONObject tool_call = (JSONObject) item;
                     conversation.put(new JSONObject().put("role", "assistant").put("tool_calls",
                             new JSONArray().put(tool_call)));
                     String method_name = tool_call.getJSONObject("function").get("name").toString();
@@ -208,26 +227,25 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface{
                                 arguments[i] = parameters[i].getType()
                                         .cast(arguments_json.get(parameters[i].getName()));
                             }
-                            try{
-                                method.invoke(this, arguments);
-                                conversation.put(new JSONObject().put("role", "tool")
+
+                            method.invoke(this, arguments);
+                            conversation.put(new JSONObject().put("role", "tool")
                                     .put("content", "status: ok")
                                     .put("tool_call_id", tool_call.getString("id")));
-                            }catch(Exception e)
-                            {
-                                e.printStackTrace();
-                                conversation.put(new JSONObject().put("role", "tool")
-                                    .put("content", "status: Errore, riprovare!")
-                                    .put("tool_call_id", tool_call.getString("id")));
-                            }
-                            
-                            
-                            response = performAPICall();
+
                         }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    response=new JSONObject().put("content", "non sono riuscito a perfezionare la creazione!").put("role", "assistant");
+                    conversation.put(new JSONObject().put("role", "tool")
+                            .put("content", "status: Errore, riprovare!")
+                            .put("tool_call_id", tool_call.getString("id")));
+                }
+                try {
+                    response = performAPICall();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    conversation = conversation_aux;
                 }
             });
             conversation.put(response);
@@ -243,12 +261,12 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface{
         campaign_Engine.setCampaign_name(campaign_name);
     }
 
-    public void createPc(String name, String physical_description) {
-        campaign_Engine.create_Pc(name, physical_description);
+    public void createPc(String name, String physical_description, String scene_name) {
+        campaign_Engine.create_Pc(name, physical_description, scene_name);
     }
 
-    public void createNpc(String description, String scene_name) throws Exception {
-        campaign_Engine.create_npc(description, scene_name);
+    public void createNpc(String name, String description, String scene_name) throws Exception {
+        campaign_Engine.create_npc(name, description, scene_name);
     }
 
     public void createScene(String name, String description) {
