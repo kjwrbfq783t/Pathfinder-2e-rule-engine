@@ -17,19 +17,19 @@ import java.nio.charset.StandardCharsets;
 public class NpcIAOpenAi implements NpcIAInterface {
     private JSONArray conversation;
     private JSONObject system_instruction;
-    private String description;
-    private String scene_description;
-    private final String api_token = "Bearer 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";
+
+    private final String api_token = "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";
 
 
     @Override
-    public void load_initialConf(String description, String scene_description,String scene_name) {
-        this.description=description;
-        this.scene_description=scene_description;
-        this.system_instruction= new JSONObject().put("role", "system").put("content", description
-                + "Di seguito il log delle tue posizioni nella mappa, il più recente è quello più in basso:"
-                +"->"+scene_name+": "+ scene_description+"\n");
+    public void load_initialConf(String name,String description, String scene_description,String scene_name) {
+
+        this.system_instruction= new JSONObject().put("role", "system").put("content","rappresenti un npc di una campagna roleplay."+"ecco le informazioni sul tuo personaggio."
+        +"{nome: "+name+", descrizione: "+description+"} "
+                + "Di seguito il log delle tue posizioni nella mappa, la freccia -> indica un ordine:"
+                +"->"+"{nome scena: "+scene_name+", scene_description: "+ scene_description+"}");
         this.conversation=new JSONArray();
+        conversation.put(system_instruction);
         
     }
         
@@ -44,9 +44,7 @@ public class NpcIAOpenAi implements NpcIAInterface {
         con.setRequestProperty("OpenAI-Project", "proj_CCAWMJmb5LiimSbyUq3vmEeR");
         JSONObject data = new JSONObject();
         data.put("model", "gpt-4o");
-        JSONArray messages=conversation;
-        messages.put(system_instruction);
-        messages.put(new JSONObject().put("role", "user").put("content", name + ": " + text));
+        conversation.put(new JSONObject().put("role", "user").put("content", name + ": " + text));
         data.put("messages", conversation);
         con.setDoOutput(true);
 
@@ -55,7 +53,7 @@ public class NpcIAOpenAi implements NpcIAInterface {
         String output = buff.lines().reduce((a, b) -> a + b).get();
         buff.close();
         String response = new JSONObject(output).getJSONArray("choices").getJSONObject(0).getJSONObject("message").toString();
-        conversation.put(new JSONObject().put("role", "user").put("content", name + ": " + text));
+
         conversation.put(new JSONObject().put("role", "assistant").put("content", response));
         return response;
     }

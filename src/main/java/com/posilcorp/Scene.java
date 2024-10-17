@@ -3,11 +3,12 @@ package com.posilcorp;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class Scene {
+public class Scene implements InventoryableInterface{
     private String Description;
     private String name;
     private HashMap<String,Pc_character> pc_charatcters;
     private HashMap<String,Npc_character> npc_charatcters;
+    private Inventory inventory;
 
     
 
@@ -16,6 +17,7 @@ public class Scene {
         this.name = name;
         this.pc_charatcters=new HashMap<String,Pc_character>();
         this.npc_charatcters=new HashMap<String,Npc_character>();
+        inventory=new Inventory();
     }
     public String getDescription() {
         return Description;
@@ -33,6 +35,9 @@ public class Scene {
         npc_charatcters.put(npc_character.getName(), npc_character);
     }
 
+    public Inventory getInventory() {
+        return inventory;
+    }
     public void setDescription(String description) {
         Description = description;
   
@@ -40,5 +45,15 @@ public class Scene {
     public String getName(){
         return this.name;
     }
+    @Override
+    public void putInInventory(Item item) {
+        inventory.put(item);
+    }
+
+    @Override
+    public Item getFromInventory(String item_name) {
+        return inventory.get(item_name);
+    }
+
     
 }

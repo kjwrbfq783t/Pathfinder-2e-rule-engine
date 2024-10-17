@@ -1,13 +1,13 @@
 package com.posilcorp;
 
 
-
-public class Npc_character {
+public class Npc_character implements InventoryableInterface{
 
     public String name;
     public Scene scene_is_on;
     public NpcIAInterface intelligence;
     public String description;
+    private Inventory inventory;
 
 
     public Npc_character(String name,String description,Scene scene_is_on,NpcIAInterface intelligence) {
@@ -15,7 +15,9 @@ public class Npc_character {
 
         this.scene_is_on = scene_is_on;
         this.description=description;
-        intelligence.load_initialConf(description, scene_is_on.getDescription(),scene_is_on.getName());
+        this.intelligence=intelligence;
+        intelligence.load_initialConf(name,description, scene_is_on.getDescription(),scene_is_on.getName());
+        inventory=new Inventory();
     }
 
     public String speak_to(String name,String text){
@@ -33,6 +35,7 @@ public class Npc_character {
         return scene_is_on;
     }
 
+
     public String getName() {
         return name;
     }
@@ -40,6 +43,16 @@ public class Npc_character {
     public void changeScene(Scene new_scene){
         this.scene_is_on=new_scene;
         intelligence.updateScene(new_scene.getDescription(),new_scene.getName());
+    }
+
+    @Override
+    public void putInInventory(Item item) {
+        inventory.put(item);
+    }
+
+    @Override
+    public Item getFromInventory(String item_name) {
+        return inventory.get(item_name);
     }
 
     

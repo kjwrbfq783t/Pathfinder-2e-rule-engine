@@ -27,23 +27,64 @@ import java.util.List;
 public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
     private TelegramClient telegramClient = new OkHttpTelegramClient("7957732855:AAFRFb6x5XxgfaT1837wRg_ZDYaS4xky5xY");
 
-    //questi rappresentano oggetti di sessione.
+    // questi rappresentano oggetti di sessione.
     private HashMap<String, String> campaign_creating_status;
     HashMap<String, CampaignCreatorIAInterface> campaignCreatorList;
-    HashMap<String,CampaignManagerAIOpenAi> campaignManagerList;
+    HashMap<String, CampaignManagerIAInterface> campaignManagerList;
 
     HashMap<String, Boolean> turned_on;
 
     public DungeonMaster() {
         campaign_creating_status = new HashMap<String, String>();
-        campaignManagerList=new HashMap<String,CampaignManagerAIOpenAi>();
+        campaignManagerList = new HashMap<String, CampaignManagerIAInterface>();
         campaignCreatorList = new HashMap<String, CampaignCreatorIAInterface>();
         turned_on = new HashMap<String, Boolean>();
+
+        // Campaign for dev purposes
+        CampaignCreatorIAOpenAi devCampaignCreator = new CampaignCreatorIAOpenAi();
+        devCampaignCreator.setCampaignEngine(new Campaign_Engine());
+        devCampaignCreator.setCampaignName("era delle ceneri");
+        devCampaignCreator.createScene("foresta", "una foresta brulicante di creature mostruose");
+        devCampaignCreator.createScene("piazza", "una piazza affollata con bancarelle e mercanti");
+        try {
+            devCampaignCreator.createPc("cosimo", "un guerriero con scudo e spada", "piazza");
+            devCampaignCreator.createPc("Antonio", "un guerriero con scudo e spada", "piazza");
+            devCampaignCreator.createPc("Giovanni", "un guerriero con scudo e spada", "piazza");
+
+            devCampaignCreator.createNpc("mario", "un mercante di gioielli", "piazza");
+            devCampaignCreator.createNpc("filippo", "un boscaiolo", "foresta");
+            
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
     public void consume(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()
+                && update.getMessage().getText().equals("/load_dev_campaign@KyrkBot")) {
+            CampaignCreatorIAOpenAi devCampaignCreator = new CampaignCreatorIAOpenAi();
+            devCampaignCreator.setCampaignEngine(new Campaign_Engine());
+            devCampaignCreator.setCampaignName("era delle ceneri");
+            devCampaignCreator.createScene("foresta", "una foresta brulicante di creature mostruose");
+            devCampaignCreator.createScene("piazza", "una piazza affollata con bancarelle e mercanti");
+            try {
+                devCampaignCreator.createPc("cosimo", "un guerriero con scudo e spada", "piazza");
+                devCampaignCreator.createPc("antonio", "ladro agile", "piazza");
+
+                devCampaignCreator.createNpc("mario", "un mercante di gioielli", "piazza");
+                devCampaignCreator.createNpc("filippo", "boscaiolo", "foresta");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+            campaignManagerList.put(update.getMessage().getChatId().toString(), new CampaignManagerAIOpenAi().setCampaign_Engine(
+                devCampaignCreator.getCampaign_Engine()
+            ));
+            campaign_creating_status.put(update.getMessage().getChatId().toString(),"terminated");
+        } else if (update.hasMessage() && update.getMessage().hasText()
                 && update.getMessage().getText().equals("/start@KyrkBot")) {
             turned_on.put(update.getMessage().getChatId().toString(), true);
             String creating_status = campaign_creating_status.get(update.getMessage().getChatId().toString());
@@ -83,7 +124,8 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
                 List<InlineKeyboardRow> keyboards = new ArrayList<InlineKeyboardRow>();
                 keyboards.add(keyboard);
                 InlineKeyboardMarkup keyboardmarkup = new InlineKeyboardMarkup(keyboards);
-                String response = campaignCreatorList.get(update.getMessage().getChatId().toString()).interact(update.getMessage().getFrom().getFirstName(),null);
+                String response = campaignCreatorList.get(update.getMessage().getChatId().toString())
+                        .interact(update.getMessage().getFrom().getFirstName(), null);
 
                 SendMessage sendMessage = new SendMessage(update.getMessage().getChatId().toString(), response);
                 sendMessage.setParseMode("Markdown");
@@ -95,7 +137,25 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
                 }
 
             } else if (creating_status.equals("terminated")) {
-                // riprendi l'avventura da dove l'hai lasciata.
+                CampaignManagerIAInterface campaignManager=campaignManagerList.get(update.getMessage().getChatId().toString());
+                InlineKeyboardRow keyboard = new InlineKeyboardRow();
+                InlineKeyboardButton button = new InlineKeyboardButton("Esci");
+
+                button.setCallbackData("quit");
+                keyboard.add(button);
+                List<InlineKeyboardRow> keyboards = new ArrayList<InlineKeyboardRow>();
+                keyboards.add(keyboard);
+                InlineKeyboardMarkup keyboardmarkup = new InlineKeyboardMarkup(keyboards);
+                String response = campaignManager.interact(null, null);
+                SendMessage sendMessage = new SendMessage(update.getMessage().getChatId().toString(), response);
+                sendMessage.setParseMode("Markdown");
+
+                sendMessage.setReplyMarkup(keyboardmarkup);
+                try {
+                    telegramClient.execute(sendMessage);
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
 
             }
         } else if (update.hasCallbackQuery()) {
@@ -125,7 +185,7 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
                     keyboards.add(keyboard);
                     InlineKeyboardMarkup keyboardmarkup = new InlineKeyboardMarkup(keyboards);
                     SendMessage sm = new SendMessage(update.getCallbackQuery().getMessage().getChatId().toString(),
-                            campaignCreatorList.get(chatID).interact(callback.getFrom().getFirstName(),null));
+                            campaignCreatorList.get(chatID).interact(callback.getFrom().getFirstName(), null));
                     sm.setReplyMarkup(keyboardmarkup);
                     sm.setParseMode("Markdown");
                     telegramClient.execute(sm);
@@ -144,18 +204,18 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }
-                CampaignManagerAIOpenAi campaignManager=new CampaignManagerAIOpenAi();
+                CampaignManagerAIOpenAi campaignManager = new CampaignManagerAIOpenAi();
                 campaignManager.setCampaign_Engine(campaignCreatorList.get(chatID).getCampaign_Engine());
-                campaignManagerList.put(chatID,campaignManager);
+                campaignManagerList.put(chatID, campaignManager);
                 InlineKeyboardRow keyboard = new InlineKeyboardRow();
                 InlineKeyboardButton button = new InlineKeyboardButton("Esci");
-                
+
                 button.setCallbackData("quit");
                 keyboard.add(button);
                 List<InlineKeyboardRow> keyboards = new ArrayList<InlineKeyboardRow>();
                 keyboards.add(keyboard);
                 InlineKeyboardMarkup keyboardmarkup = new InlineKeyboardMarkup(keyboards);
-                String response = campaignManager.interact(null,null);
+                String response = campaignManager.interact(null, null);
                 SendMessage sendMessage = new SendMessage(callback.getMessage().getChatId().toString(), response);
                 sendMessage.setParseMode("Markdown");
 
@@ -165,11 +225,6 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }
-
-
-
-
-
 
             } else if (callback.getData().equals("pause_campaign_creation")) {
                 EditMessageReplyMarkup emrm = new EditMessageReplyMarkup(
@@ -199,7 +254,7 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
                 keyboards.add(keyboard);
                 InlineKeyboardMarkup keyboardmarkup = new InlineKeyboardMarkup(keyboards);
                 String response = campaignCreatorList.get(update.getMessage().getChatId().toString())
-                        .interact(update.getMessage().getFrom().getFirstName(),update.getMessage().getText());
+                        .interact(update.getMessage().getFrom().getFirstName(), update.getMessage().getText());
 
                 SendMessage sendMessage = new SendMessage(update.getMessage().getChatId().toString(), response);
                 sendMessage.setParseMode("Markdown");
@@ -211,16 +266,18 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
                     e.printStackTrace();
                 }
             } else {
-                CampaignManagerAIOpenAi campaignManager=campaignManagerList.get(update.getMessage().getChatId().toString());
+                CampaignManagerIAInterface campaignManager = campaignManagerList
+                        .get(update.getMessage().getChatId().toString());
                 InlineKeyboardRow keyboard = new InlineKeyboardRow();
                 InlineKeyboardButton button = new InlineKeyboardButton("Esci");
-                
+
                 button.setCallbackData("quit");
                 keyboard.add(button);
                 List<InlineKeyboardRow> keyboards = new ArrayList<InlineKeyboardRow>();
                 keyboards.add(keyboard);
                 InlineKeyboardMarkup keyboardmarkup = new InlineKeyboardMarkup(keyboards);
-                String response = campaignManager.interact(update.getMessage().getFrom().getFirstName(),update.getMessage().getText());
+                String response = campaignManager.interact(update.getMessage().getFrom().getFirstName(),
+                        update.getMessage().getText());
                 SendMessage sendMessage = new SendMessage(update.getMessage().getChatId().toString(), response);
                 sendMessage.setParseMode("Markdown");
 
@@ -240,7 +297,7 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
         SetMyCommands setMyCommands = new SetMyCommands(
                 Arrays.asList(
                         new BotCommand("/start", "Activate DungeonMaster"),
-                        new BotCommand("/remove_campaign", "List available commands")));
+                        new BotCommand("/load_dev_campaign", "List available commands")));
 
         setMyCommands.setScope(new BotCommandScopeDefault());
 
