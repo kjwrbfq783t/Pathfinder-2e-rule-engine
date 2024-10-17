@@ -5,7 +5,6 @@ public interface NpcIAInterface{
 
 
 
-    public void load_initialConf(String name,String description,String scene_description,String scene_name);
 
     public String speak_to(String name,String text) throws Exception;
 

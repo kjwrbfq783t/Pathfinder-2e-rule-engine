@@ -20,7 +20,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.posilcorp.OpenAI.CampaignCreatorIAOpenAi;
-import com.posilcorp.OpenAI.CampaignManagerAIOpenAi;
+import com.posilcorp.OpenAI.CampaignManagerIAOpenAi;
 
 import java.util.List;
 
@@ -29,15 +29,15 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
 
     // questi rappresentano oggetti di sessione.
     private HashMap<String, String> campaign_creating_status;
-    HashMap<String, CampaignCreatorIAInterface> campaignCreatorList;
-    HashMap<String, CampaignManagerIAInterface> campaignManagerList;
+    HashMap<String, CampaignCreatorInterface> campaignCreatorList;
+    HashMap<String, CampaignManagerInterface> campaignManagerList;
 
     HashMap<String, Boolean> turned_on;
 
     public DungeonMaster() {
         campaign_creating_status = new HashMap<String, String>();
-        campaignManagerList = new HashMap<String, CampaignManagerIAInterface>();
-        campaignCreatorList = new HashMap<String, CampaignCreatorIAInterface>();
+        campaignManagerList = new HashMap<String, CampaignManagerInterface>();
+        campaignCreatorList = new HashMap<String, CampaignCreatorInterface>();
         turned_on = new HashMap<String, Boolean>();
 
         // Campaign for dev purposes
@@ -80,7 +80,7 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
                 e.printStackTrace();
             }
             
-            campaignManagerList.put(update.getMessage().getChatId().toString(), new CampaignManagerAIOpenAi().setCampaign_Engine(
+            campaignManagerList.put(update.getMessage().getChatId().toString(), new CampaignManagerIAOpenAi().setCampaign_Engine(
                 devCampaignCreator.getCampaign_Engine()
             ));
             campaign_creating_status.put(update.getMessage().getChatId().toString(),"terminated");
@@ -137,7 +137,7 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
                 }
 
             } else if (creating_status.equals("terminated")) {
-                CampaignManagerIAInterface campaignManager=campaignManagerList.get(update.getMessage().getChatId().toString());
+                CampaignManagerInterface campaignManager=campaignManagerList.get(update.getMessage().getChatId().toString());
                 InlineKeyboardRow keyboard = new InlineKeyboardRow();
                 InlineKeyboardButton button = new InlineKeyboardButton("Esci");
 
@@ -204,7 +204,7 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }
-                CampaignManagerAIOpenAi campaignManager = new CampaignManagerAIOpenAi();
+                CampaignManagerIAOpenAi campaignManager = new CampaignManagerIAOpenAi();
                 campaignManager.setCampaign_Engine(campaignCreatorList.get(chatID).getCampaign_Engine());
                 campaignManagerList.put(chatID, campaignManager);
                 InlineKeyboardRow keyboard = new InlineKeyboardRow();
@@ -266,7 +266,7 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
                     e.printStackTrace();
                 }
             } else {
-                CampaignManagerIAInterface campaignManager = campaignManagerList
+                CampaignManagerInterface campaignManager = campaignManagerList
                         .get(update.getMessage().getChatId().toString());
                 InlineKeyboardRow keyboard = new InlineKeyboardRow();
                 InlineKeyboardButton button = new InlineKeyboardButton("Esci");

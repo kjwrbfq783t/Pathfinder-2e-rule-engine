@@ -1,59 +1,58 @@
 package com.posilcorp;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class Scene implements InventoryableInterface{
-    private String Description;
-    private String name;
-    private HashMap<String,Pc_character> pc_charatcters;
-    private HashMap<String,Npc_character> npc_charatcters;
+import com.posilcorp.EquipmentLogic.Inventory;
+import com.posilcorp.EquipmentLogic.ObjectWithInventory;
+
+public class Scene extends ObjectYouCanSpeakTo implements ObjectWithInventory{
+    private String description;
     private Inventory inventory;
 
+    private HashMap<String,Character> characters;
     
-
     public Scene(String description, String name) {
-        Description = description;
-        this.name = name;
-        this.pc_charatcters=new HashMap<String,Pc_character>();
-        this.npc_charatcters=new HashMap<String,Npc_character>();
-        inventory=new Inventory();
+        super(name);
+        this.description = description;
+        this.inventory=new Inventory();
+        this.characters=new HashMap<String,Character>();
     }
     public String getDescription() {
-        return Description;
+        return description;
     }
-    public Collection<Pc_character> getPc_characters(){
-        return pc_charatcters.values();
+    public Collection<Character> getPc_characters(){
+        return characters.values();
     }
-    public Collection<Npc_character> getNpc_characters(){
-        return npc_charatcters.values();
+    public Collection<Character> getNpc_characters() {
+        ArrayList<Character> npcs=new ArrayList<Character>();
+        for(Character character:characters.values()){
+            if(character.isNPC){
+                npcs.add(character);
+            }
+        }
+        return npcs;
     }
-    public void addPc(Pc_character pc_character){
-        pc_charatcters.put(pc_character.getName(), pc_character);
-    }
-    public void addNpc(Npc_character npc_character){
-        npc_charatcters.put(npc_character.getName(), npc_character);
+    public void addCharacter(Character character){
+    characters.put(character.getName(),character);
     }
 
+    public void setDescription(String description) {
+        description = description;
+  
+    }
+
+    public String speak_to(ObjectYouCanSpeakTo obj, String text) throws Exception{
+        return "Sono una scena utilizza la mia descrizione per generare una risposta: "+this.description;
+    }
+    @Override
     public Inventory getInventory() {
         return inventory;
     }
-    public void setDescription(String description) {
-        Description = description;
-  
-    }
-    public String getName(){
-        return this.name;
-    }
     @Override
-    public void putInInventory(Item item) {
-        inventory.put(item);
+    public Scene getScene_is_on() {
+        return this;
     }
 
-    @Override
-    public Item getFromInventory(String item_name) {
-        return inventory.get(item_name);
-    }
-
-    
 }

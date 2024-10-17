@@ -17,10 +17,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.posilcorp.CampaignCreatorIAInterface;
+import com.posilcorp.CampaignCreatorInterface;
 import com.posilcorp.Campaign_Engine;
 
-public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface {
+public class CampaignCreatorIAOpenAi implements CampaignCreatorInterface {
 
     public Campaign_Engine getCampaign_Engine() {
         return campaign_Engine;
@@ -55,7 +55,6 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface {
                 "3. createPc(String name, String phisical_description,String scene_name) per creare un personaggio giocante. Se non viene fornito alcun nome, il campo 'name' va riempito con il nome dell'utente che ha inviato il messaggio.\n"
                 +
                 "4. createNpc(String description, String scene_name) per creare un personaggio non giocante, specificando la sua descrizione e la scena in cui appare.\n"
-                + "5. createAndAddItem(String item_name,String item_description,String element_name,String element_type) crea un item e aggiungilo all'elemento di gioco.\n\n"
                 + "Guiderai l'utente passo per passo nel fornire queste informazioni,oppure invocherai le funzioni tutte in una volta, assicurandoti che ogni funzione sia invocata correttamente per costruire la campagna. Al termine della creazione, inviterai l'utente a terminare la creazione. Utilizza emoji per una chat telegram"
                 + "Non inserire eventuali oggetti nella descrizione. aggiungili successivamente invocando la funzione createAndAddItem";
         conversation.put(new JSONObject().put("role", "system").put("content", system_instructions));
@@ -157,51 +156,16 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface {
                 "    }\n" +
                 "  }\n" +
                 "}";
-        String createAndAddItem = "{\n" +
-                "  \"type\": \"function\",\n" +
-                "  \"function\": {\n" +
-                "    \"name\": \"createAndAddItem\",\n" +
-                "    \"description\": \"Crea un oggetto e lo assegna a un elemento di gioco specifico, come un personaggio giocante, un personaggio non giocante o una scena di gioco.\",\n"
-                +
-                "    \"parameters\": {\n" +
-                "      \"type\": \"object\",\n" +
-                "      \"properties\": {\n" +
-                "        \"item_name\": {\n" +
-                "          \"type\": \"string\",\n" +
-                "          \"description\": \"Il nome dell'oggetto da creare.\"\n" +
-                "        },\n" +
-                "        \"item_description\": {\n" +
-                "          \"type\": \"string\",\n" +
-                "          \"description\": \"Una descrizione dettagliata dell'oggetto.\"\n" +
-                "        },\n" +
-                "        \"element_type\": {\n" +
-                "          \"type\": \"string\",\n" +
-                "          \"enum\": [\"Pc_character\", \"Npc_character\", \"Scene\"],\n" +
-                "          \"description\": \"Il tipo di elemento di gioco a cui assegnare l'oggetto. I valori possibili sono: 'Pc_character' per i personaggi giocanti, 'Npc_character' per i personaggi non giocanti e 'Scene' per le scene di gioco.\"\n"
-                +
-                "        },\n" +
-                "        \"element_name\": {\n" +
-                "          \"type\": \"string\",\n" +
-                "          \"description\": \"Il nome dell'elemento di gioco (personaggio o scena) a cui viene aggiunto l'oggetto.\"\n"
-                +
-                "        }\n" +
-                "      },\n" +
-                "      \"required\": [\"item_name\", \"item_description\", \"element_type\", \"element_name\"]\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
 
         JSONObject createNpc_json = new JSONObject(createNpc);
         JSONObject createPc_json = new JSONObject(createPc);
         JSONObject createScene_json = new JSONObject(createScene);
         JSONObject setCampaignName_json = new JSONObject(setCampaignName);
-        JSONObject createAndAddItem_json = new JSONObject(createAndAddItem);
         JSONArray tools = new JSONArray();
         tools.put(createNpc_json);
         tools.put(createPc_json);
         tools.put(createScene_json);
         tools.put(setCampaignName_json);
-        tools.put(createAndAddItem_json);
         data.put("tools", tools);
         data.put("model", "gpt-4o");
     }
@@ -290,33 +254,4 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorIAInterface {
     public void createScene(String name, String description) {
         campaign_Engine.create_scene(description, name);
     }
-
-    public void createAndAddItem(String item_name, String item_description, String element_name, String element_type)
-            throws Exception {
-        Set<String> names;
-        Integer best_score = null;
-        String matched_element_type = null;
-        for (String fetched_name : campaign_Engine.getElementTypes()) {
-            if (best_score == null) {
-                best_score = LevenshteinDistance.getDefaultInstance().apply(element_type, fetched_name);
-                matched_element_type = fetched_name;
-            } else if (LevenshteinDistance.getDefaultInstance().apply(element_type, fetched_name) < best_score) {
-                matched_element_type= fetched_name;
-            }
-        }
-        names=campaign_Engine.getKeys(matched_element_type);
-        best_score = null;
-        String matched_element_name = null;
-        for (String fetched_name : names) {
-            if (best_score == null) {
-                best_score = LevenshteinDistance.getDefaultInstance().apply(element_name, fetched_name);
-                matched_element_name = fetched_name;
-            } else if (LevenshteinDistance.getDefaultInstance().apply(element_name, fetched_name) < best_score) {
-                matched_element_name = fetched_name;
-            }
-        }
-
-        campaign_Engine.createAndAddItem(item_name, item_description, matched_element_name, matched_element_type);
-    }
-
 }

@@ -18,8 +18,15 @@ import org.json.JSONObject;
 
 import com.posilcorp.CampaignManagerInterface;
 import com.posilcorp.Campaign_Engine;
+import com.posilcorp.ObjectYouCanSpeakTo;
+import com.posilcorp.Scene;
+import com.posilcorp.EquipmentLogic.EquipSlot;
+import com.posilcorp.EquipmentLogic.Item;
+import com.posilcorp.EquipmentLogic.ObjectWithInventory;
+import com.posilcorp.Character;
+import com.posilcorp.Utilities.Levenshtein;
 
-public class CampaignManagerIAOpenAi implements CampaignManagerInterface{
+public class CampaignManagerIAOpenAi implements CampaignManagerInterface {
     private final String url = "https://api.openai.com/v1/chat/completions";
     private final String api_Token = "Bearer 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";
 
@@ -40,9 +47,9 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface{
                 "\n" +
                 "- **getEnvironment(nome_pg)**: Usa questa funzione per fornire la descrizione dell'ambiente in cui si trova un personaggio specifico (nome_pg). Formatta la risposta in Markdown, ad esempio con *testo in corsivo* o **testo in grassetto**, e includi emoji appropriate come 🌲 o 🏰 a seconda dell'ambiente descritto.\n"
                 +
-                "- **changeScene(recipient, scene_name)**: Usa questa funzione quando un personaggio vuole cambiare scena. 'recipient' è il nome del personaggio e 'scene_name' è il nome della scena in cui vuole andare. Fornisci un output ben formattato, ad esempio: \"⚔️ **[Nome_PG] si sposta nella scena [Nome_Scena]**\".\n"
+                "- **changeScene(recipient, sceneName)**: Usa questa funzione quando un personaggio vuole cambiare scena. 'recipient' è il nome del personaggio e 'sceneName' è il nome della scena in cui vuole andare. Fornisci un output ben formattato, ad esempio: \"⚔️ **[Nome_PG] si sposta nella scena [Nome_Scena]**\".\n"
                 +
-                "- **speak_to(sender, recipient, text)**: Usa questa funzione quando un personaggio vuole parlare a un NPC. 'sender' è il nome del personaggio, 'recipient' è il nome dell'NPC e 'text' è il messaggio che il personaggio vuole dire. Rispondi in Markdown, ad esempio: \"🗣️ *[Nome_PG] dice a [Nome_NPC]: '[Testo]'*\".\n"
+                "- **speak_to(sender, recipient, text)**: Usa questa funzione quando un personaggio vuole parlare a un'NPC o parlare al vuoto nella scena. 'sender' è il nome del personaggio, 'recipient' è il nome dell'NPC o della scena e 'text' è il messaggio che il personaggio vuole dire. Rispondi in Markdown, ad esempio: \"🗣️ *[Nome_PG] dice a [Nome_NPC]: '[Testo]'*\".\n"
                 +
                 "- **getKnowScenes()**: Usa questa funzione per fornire una lista delle scene conosciute nel gioco. Presenta la lista formattata in Markdown con delle emoji, ad esempio: \"🌍 **Scene Disponibili**: 1. 🏞️ Foresta Incantata 2. 🏰 Castello Antico 3. 🏙️ Villaggio Medievale\".\n"
                 +
@@ -58,20 +65,20 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface{
                 "    \"parameters\": {\n" +
                 "      \"type\": \"object\",\n" +
                 "      \"properties\": {\n" +
-                "        \"sender\": {\n" +
+                "        \"senderName\": {\n" +
                 "          \"type\": \"string\",\n" +
                 "          \"description\": \"The name of the person sending the message\"\n" +
                 "        },\n" +
-                "        \"recipient\": {\n" +
+                "        \"recipientName\": {\n" +
                 "          \"type\": \"string\",\n" +
-                "          \"description\": \"The name of the person receiving the message\"\n" +
+                "          \"description\": \"The name of the object receiving the message\"\n" +
                 "        },\n" +
                 "        \"text\": {\n" +
                 "          \"type\": \"string\",\n" +
                 "          \"description\": \"The content of the message\"\n" +
                 "        }\n" +
                 "      },\n" +
-                "      \"required\": [\"sender\", \"recipient\", \"text\"]\n" +
+                "      \"required\": [\"senderName\", \"recipientName\", \"text\"]\n" +
                 "    }\n" +
                 "  }\n" +
                 "}";
@@ -83,16 +90,16 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface{
                 "    \"parameters\": {\n" +
                 "      \"type\": \"object\",\n" +
                 "      \"properties\": {\n" +
-                "        \"recipient\": {\n" +
+                "        \"recipientName\": {\n" +
                 "          \"type\": \"string\",\n" +
                 "          \"description\": \"The name of the person for whom the scene is being changed\"\n" +
                 "        },\n" +
-                "        \"scene_name\": {\n" +
+                "        \"sceneName\": {\n" +
                 "          \"type\": \"string\",\n" +
                 "          \"description\": \"The name of the scene to switch to\"\n" +
                 "        }\n" +
                 "      },\n" +
-                "      \"required\": [\"recipient\", \"scene_name\"]\n" +
+                "      \"required\": [\"recipientName\", \"sceneName\"]\n" +
                 "    }\n" +
                 "  }\n" +
                 "}";
@@ -104,13 +111,13 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface{
                 "    \"parameters\": {\n" +
                 "      \"type\": \"object\",\n" +
                 "      \"properties\": {\n" +
-                "        \"name\": {\n" +
+                "        \"pcName\": {\n" +
                 "          \"type\": \"string\",\n" +
                 "          \"description\": \"The name of the person requesting information about the environment.\"\n"
                 +
                 "        }\n" +
                 "      },\n" +
-                "      \"required\": [\"name\"],\n" +
+                "      \"required\": [\"pcName\"],\n" +
                 "      \"additionalProperties\": false\n" +
                 "    }\n" +
                 "  }\n" +
@@ -131,7 +138,7 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface{
         JSONObject speak_to_json = new JSONObject(speak_to);
         JSONObject changeScene_json = new JSONObject(changeScene);
         JSONObject getEnvironment_json = new JSONObject(getEnvironment);
-        JSONObject getKnownScenes_json=new JSONObject(getKnowScenes);
+        JSONObject getKnownScenes_json = new JSONObject(getKnowScenes);
         JSONArray tools = new JSONArray();
         tools.put(getEnvironment_json);
         tools.put(getKnownScenes_json);
@@ -161,7 +168,7 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface{
     }
 
     public String interact(String name, String message) {
-        JSONArray conversation_aux = conversation;
+        JSONArray conversation_aux = new JSONArray(conversation.toString());
 
         if (message != null)
             data.put("messages",
@@ -242,99 +249,37 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface{
 
     }
 
-    public String speak_to(String sender, String recipient, String text) throws Exception {
-        String matched_sender = "";
-        Integer best_score = null;
-        for (String fetched_name : campaign_Engine.getPc_characthers().keySet()) {
-            if (best_score == null) {
-                best_score = LevenshteinDistance.getDefaultInstance().apply(sender, fetched_name);
-                matched_sender = fetched_name;
-            } else if (LevenshteinDistance.getDefaultInstance().apply(sender, fetched_name) < best_score) {
-                matched_sender = fetched_name;
-            }
-        }
-        String matched_recipient = "";
-        best_score = null;
-        for (String fetched_name : campaign_Engine.getNpc_characthers().keySet()) {
-            if (best_score == null) {
-                best_score = LevenshteinDistance.getDefaultInstance().apply(recipient, fetched_name);
-                matched_recipient = fetched_name;
-            } else if (LevenshteinDistance.getDefaultInstance().apply(recipient, fetched_name) < best_score) {
-                matched_recipient = fetched_name;
-            }
-        }
-        String response = campaign_Engine.speak(matched_sender, matched_recipient, text);
-        return "{\"name\": " + matched_recipient + ", \"text\":" + response + "}";
+    // non esporre la struttura, reinserire nel campaign engine tutto per
+    // check!!!!!!
+    public String speak_to(String senderName, String recipientName, String text) throws Exception {
+        ObjectYouCanSpeakTo matched_sender = Levenshtein.fetchObjectYouCanSpeakTo(senderName,
+                campaign_Engine.getObjectYouCanSpeakTos());
+        ObjectYouCanSpeakTo matched_recipient = Levenshtein.fetchObjectYouCanSpeakTo(recipientName,
+                campaign_Engine.getObjectYouCanSpeakTos());
+        String response = matched_recipient.speak_to(matched_sender, text);
+        return "{\"name\": " + matched_recipient.getName() + ", \"text\":" + response + "}";
     }
 
-    public String changeScene(String recipient, String scene_name) throws Exception {
-        String matched_scene_name = "";
-        Integer best_score = null;
-        for (String fetched_name : campaign_Engine.getScenes().keySet()) {
-            if (best_score == null) {
-                best_score = LevenshteinDistance.getDefaultInstance().apply(scene_name, fetched_name);
-                matched_scene_name = fetched_name;
-            } else if (LevenshteinDistance.getDefaultInstance().apply(scene_name, fetched_name) < best_score) {
-                matched_scene_name = fetched_name;
-            }
-        }
-        String matched_recipient = "";
-        best_score = null;
-        for (String fetched_name : campaign_Engine.getPc_characthers().keySet()) {
-            if (best_score == null) {
-                best_score = LevenshteinDistance.getDefaultInstance().apply(recipient, fetched_name);
-                matched_recipient = fetched_name;
-            } else if (LevenshteinDistance.getDefaultInstance().apply(recipient, fetched_name) < best_score) {
-                matched_recipient = fetched_name;
-            }
-        }
-        campaign_Engine.pc_changeScene(matched_recipient, matched_scene_name);
-        return matched_recipient + " ha cambiato scena. Ecco la descrizione del nuovo ambiente: "
-                + getEnvironment(matched_scene_name);
+    public String changeScene(String recipientName, String sceneName) throws Exception {
+        return campaign_Engine.changeScene(recipientName, sceneName);
     }
+
+    public String getKnownScenes() {
+        return campaign_Engine.getKnownScenes();
+    }
+
+    public String drawFrom(String recipientName, String slotName) throws Exception {
+        return campaign_Engine.drawFrom(recipientName, slotName);
+    }
+
+    public String take(String recipientName, String holderName, String itemName) throws Exception {
+        return campaign_Engine.take(recipientName, holderName, itemName);
+    }
+
     
-    
-    public String getKnownScenes(){
-        String scene_List_desc="";
-        for(String scene_name:campaign_Engine.getScenes().keySet()){
-            String scene_description=campaign_Engine.getScenes().get(scene_name).getDescription();
-            scene_List_desc=scene_List_desc+"{scene_name: "+scene_name+", scene_description: "+scene_description+"}";
-        }
-        return scene_List_desc;
+
+    public String getEnvironment(String pcName) throws Exception {
+        return campaign_Engine.getEnvironment(pcName);
     }
-
-    public String getEnvironment(String name) throws Exception {
-        String matched_name = "";
-        Integer best_score = null;
-        for (String fetched_name : campaign_Engine.getPc_characthers().keySet()) {
-            if (best_score == null) {
-                best_score = LevenshteinDistance.getDefaultInstance().apply(name, fetched_name);
-                matched_name = fetched_name;
-            } else if (LevenshteinDistance.getDefaultInstance().apply(name, fetched_name) < best_score) {
-                matched_name = fetched_name;
-            }
-        }
-        if (campaign_Engine.getPc_characthers().get(matched_name) != null
-                && campaign_Engine.getPc_characthers().get(matched_name).getScene_is_on() != null) {
-            String scene_description = campaign_Engine.getPc_characthers().get(matched_name).getScene_is_on().getDescription();
-            String scene_name = campaign_Engine.getPc_characthers().get(matched_name).getScene_is_on().getName();
-            String nearbyNPCs = "";
-            ArrayList<String> nearbyNpcs = campaign_Engine
-                    .getNearbyNpcs(campaign_Engine.getPc_characthers().get(matched_name).getScene_is_on().getName());
-            for (String npc_name : nearbyNpcs) {
-                nearbyNPCs = nearbyNPCs + ", " + npc_name;
-            }
-            return "Scena: " + scene_name + "\n descrizione scena: \n" + scene_description + "\n npc vicini: \n" 
-                    + nearbyNPCs;
-        } else
-            throw new Exception();
-    }
-
-
-
-
 
 }
-
-
-

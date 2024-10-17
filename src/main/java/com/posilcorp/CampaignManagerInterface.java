@@ -1,10 +1,10 @@
 package com.posilcorp;
 
-import com.posilcorp.OpenAI.CampaignManagerAIOpenAi;
+import com.posilcorp.OpenAI.CampaignManagerIAOpenAi;
 
-public interface CampaignManagerIAInterface {
+public interface CampaignManagerInterface {
     public String interact(String name, String message);
-    public CampaignManagerAIOpenAi setCampaign_Engine(Campaign_Engine campaign_Engine);
+    public CampaignManagerIAOpenAi setCampaign_Engine(Campaign_Engine campaign_Engine);
     public String speak_to(String sender, String recipient, String text) throws Exception;
     public String changeScene(String recipient, String scene_name) throws Exception;
     public String getKnownScenes();

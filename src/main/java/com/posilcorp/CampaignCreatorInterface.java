@@ -2,7 +2,7 @@ package com.posilcorp;
 
 import java.io.IOException;
 
-public interface CampaignCreatorIAInterface {
+public interface CampaignCreatorInterface {
 
     public String interact(String name,String message);
 

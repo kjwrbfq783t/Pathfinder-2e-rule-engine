@@ -21,8 +21,7 @@ public class NpcIAOpenAi implements NpcIAInterface {
     private final String api_token = "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";
 
 
-    @Override
-    public void load_initialConf(String name,String description, String scene_description,String scene_name) {
+    public NpcIAOpenAi(String name,String description, String scene_description,String scene_name) {
 
         this.system_instruction= new JSONObject().put("role", "system").put("content","rappresenti un npc di una campagna roleplay."+"ecco le informazioni sul tuo personaggio."
         +"{nome: "+name+", descrizione: "+description+"} "
