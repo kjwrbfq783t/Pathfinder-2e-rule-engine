@@ -8,13 +8,11 @@ import java.lang.reflect.Parameter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
-import org.apache.commons.text.similarity.LevenshteinDistance;
+
+
 import org.json.JSONArray;
-import org.json.JSONException;
+
 import org.json.JSONObject;
 
 import com.posilcorp.CampaignCreatorInterface;

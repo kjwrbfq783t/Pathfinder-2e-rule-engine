@@ -39,7 +39,7 @@ public class Scene extends ObjectYouCanSpeakTo implements ObjectWithInventory{
     }
 
     public void setDescription(String description) {
-        description = description;
+        this.description = description;
   
     }
 
