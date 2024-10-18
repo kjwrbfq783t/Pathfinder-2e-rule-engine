@@ -14,7 +14,7 @@ import com.posilcorp.EquipmentLogic.ObjectWithInventory;
 public class Levenshtein {
     public static ObjectYouCanSpeakTo fetchObjectYouCanSpeakTo(String text,
             HashMap<String, ObjectYouCanSpeakTo> ObjectYouCanSpeakTos) {
-        String matched = "";
+        String matched = null;
         Integer best_score = null;
         for (String fetched_name : ObjectYouCanSpeakTos.keySet()) {
             if (best_score == null) {
@@ -27,12 +27,13 @@ public class Levenshtein {
                 best_score = new_score;
             }
         }
+        if(ObjectYouCanSpeakTos.get(matched)==null)
         return ObjectYouCanSpeakTos.get(matched);
     }
 
     public static ObjectWithInventory fetchObjectWithInventory(String text,
             HashMap<String, ObjectWithInventory> ObjectWithInventorys) {
-        String matched = "";
+        String matched = null;
         Integer best_score = null;
         for (String fetched_name : ObjectWithInventorys.keySet()) {
             if (best_score == null) {
@@ -51,7 +52,7 @@ public class Levenshtein {
 
     public static Item fetchItem(String text,
             HashMap<String, Item> Items) {
-        String matched = "";
+        String matched = null;
         Integer best_score = null;
         for (String fetched_name : Items.keySet()) {
             if (best_score == null) {
@@ -68,7 +69,7 @@ public class Levenshtein {
     }
 
     public static Character fetchCharacter(String text, HashMap<String, Character> Characters) {
-        String matched = "";
+        String matched = null;
         Integer best_score = null;
         for (String fetched_name : Characters.keySet()) {
             if (best_score == null) {
@@ -86,7 +87,6 @@ public class Levenshtein {
 
 
     public static Item fetchItem(String text, Collection<Item> Items) {
-        String matched = "";
         Integer best_score = null;
         Item matched_item=null;
 
@@ -106,7 +106,7 @@ public class Levenshtein {
     }
 
     public static Scene fetchScenes(String text, HashMap<String, Scene> Scenes) {
-        String matched = "";
+        String matched = null;
         Integer best_score = null;
         for (String fetched_name : Scenes.keySet()) {
             if (best_score == null) {
