@@ -251,6 +251,19 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
                 }
                 turned_on.put(callback.getMessage().getChatId().toString(), false);
                 campaign_creating_status.put(callback.getMessage().getChatId().toString(), "pending");
+            }else if(callback.getData().equals("quit")){
+                turned_on.put(callback.getMessage().getChatId().toString(), false);
+                EditMessageReplyMarkup emrm = new EditMessageReplyMarkup(
+                    callback.getMessage().getChatId().toString(),
+                    callback.getMessage().getMessageId(), null, null, null);
+                    
+                SendMessage sendMessage = new SendMessage(callback.getMessage().getChatId().toString(), "a presto!");
+                    try {
+                        telegramClient.execute(emrm);
+                        telegramClient.execute(sendMessage);
+                    } catch (TelegramApiException e) {
+                        e.printStackTrace();
+                    }
             }
 
         } else if (update.getMessage().hasText() && turned_on.get(update.getMessage().getChatId().toString()) != null

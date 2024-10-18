@@ -437,7 +437,7 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface {
         con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         con.setRequestProperty("OpenAI-Project",System.getenv("OPENAI_PROJECT_ID"));
         con.setRequestProperty("Authorization",
-        System.getenv("OPENAI_API_KEY"));
+        "Bearer "+System.getenv("OPENAI_API_KEY"));
         data.put("messages", conversation);
         con.setDoOutput(true);
         con.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
