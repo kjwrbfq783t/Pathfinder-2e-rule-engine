@@ -14,5 +14,5 @@ public enum EquipSlot {
     HELD_DX_HAND,
     WIELDED_SX_HAND,
     WIELDED_DX_HAND,
-    SCENE;
+    WEAPON_SLOTS
 }

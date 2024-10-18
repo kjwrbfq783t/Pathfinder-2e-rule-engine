@@ -7,10 +7,12 @@ public class StowingItem extends Item {
     private ArrayList<Item> items;
     private int bulk_capacity;
 
-    public StowingItem(String name, String description, ArrayList<EquipSlot> possible_slots, int bulk,
+    public StowingItem(String name, String description, int bulk,
             int bulk_capacity) {
-        super(name, description, possible_slots, bulk);
+        super(name, description, bulk);
         this.bulk_capacity = bulk_capacity;
+        possible_slots.add(EquipSlot.WEARED_BACK);
+        this.items=new ArrayList<Item>();
     }
 
     public void put(Item item) throws Exception {

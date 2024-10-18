@@ -13,7 +13,7 @@ import com.posilcorp.EquipmentLogic.ObjectWithInventory;
 
 public class Levenshtein {
     public static ObjectYouCanSpeakTo fetchObjectYouCanSpeakTo(String text,
-            HashMap<String, ObjectYouCanSpeakTo> ObjectYouCanSpeakTos) {
+            HashMap<String, ObjectYouCanSpeakTo> ObjectYouCanSpeakTos) throws Exception {
         String matched = null;
         Integer best_score = null;
         for (String fetched_name : ObjectYouCanSpeakTos.keySet()) {
@@ -27,12 +27,13 @@ public class Levenshtein {
                 best_score = new_score;
             }
         }
-        if(ObjectYouCanSpeakTos.get(matched)==null)
+        if (ObjectYouCanSpeakTos.get(matched) == null)
+            throw new Exception("oggeto non trovato..");
         return ObjectYouCanSpeakTos.get(matched);
     }
 
     public static ObjectWithInventory fetchObjectWithInventory(String text,
-            HashMap<String, ObjectWithInventory> ObjectWithInventorys) {
+            HashMap<String, ObjectWithInventory> ObjectWithInventorys) throws Exception {
         String matched = null;
         Integer best_score = null;
         for (String fetched_name : ObjectWithInventorys.keySet()) {
@@ -46,12 +47,13 @@ public class Levenshtein {
                 best_score = new_score;
             }
         }
+        if (ObjectWithInventorys.get(matched) == null)
+            throw new Exception("oggeto non trovato..");
         return ObjectWithInventorys.get(matched);
     }
 
-
     public static Item fetchItem(String text,
-            HashMap<String, Item> Items) {
+            HashMap<String,? extends Item> Items) throws Exception {
         String matched = null;
         Integer best_score = null;
         for (String fetched_name : Items.keySet()) {
@@ -65,10 +67,13 @@ public class Levenshtein {
                 best_score = new_score;
             }
         }
+        if (Items.get(matched) == null)
+            throw new Exception("oggeto non trovato..");
+
         return Items.get(matched);
     }
 
-    public static Character fetchCharacter(String text, HashMap<String, Character> Characters) {
+    public static Character fetchCharacter(String text, HashMap<String, Character> Characters) throws Exception {
         String matched = null;
         Integer best_score = null;
         for (String fetched_name : Characters.keySet()) {
@@ -82,14 +87,15 @@ public class Levenshtein {
                 best_score = new_score;
             }
         }
+        if (Characters.get(matched) == null)
+            throw new Exception("oggeto non trovato..");
+
         return Characters.get(matched);
     }
 
-
-    public static Item fetchItem(String text, Collection<Item> Items) {
+    public static Item fetchItem(String text, Collection<? extends Item> Items) throws Exception {
         Integer best_score = null;
-        Item matched_item=null;
-
+        Item matched_item = null;
 
         for (Item fetched_Item : Items) {
             if (best_score == null) {
@@ -102,10 +108,12 @@ public class Levenshtein {
                 best_score = new_score;
             }
         }
+        if (matched_item == null)
+            throw new Exception("oggeto non trovato..");
         return matched_item;
     }
 
-    public static Scene fetchScenes(String text, HashMap<String, Scene> Scenes) {
+    public static Scene fetchScenes(String text, HashMap<String, Scene> Scenes) throws Exception {
         String matched = null;
         Integer best_score = null;
         for (String fetched_name : Scenes.keySet()) {
@@ -120,6 +128,8 @@ public class Levenshtein {
                 best_score = new_score;
             }
         }
+        if (Scenes.get(matched) == null)
+            throw new Exception("oggeto non trovato..");
         return Scenes.get(matched);
     }
 

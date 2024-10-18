@@ -1,6 +1,5 @@
 package com.posilcorp;
 
-import java.io.IOException;
 
 public interface CampaignCreatorInterface {
 

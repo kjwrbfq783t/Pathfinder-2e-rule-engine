@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.posilcorp.EquipmentLogic.EquipSlot;
+import com.posilcorp.EquipmentLogic.Inventory;
 import com.posilcorp.EquipmentLogic.Item;
 import com.posilcorp.EquipmentLogic.ItemBuilder;
 import com.posilcorp.EquipmentLogic.ObjectWithInventory;
@@ -21,6 +22,7 @@ public class Campaign_Engine {
     }
 
     public void createAndAddItemToObject(String item_name, String Object_name, String equip_slot) throws Exception {
+
         HashMap<String, ObjectWithInventory> objectsWithInventory = new HashMap<String, ObjectWithInventory>();
         for (Map.Entry<String, Scene> entry : scenes.entrySet()) {
             objectsWithInventory.put(entry.getKey(), entry.getValue());
@@ -29,9 +31,9 @@ public class Campaign_Engine {
             objectsWithInventory.put(entry.getKey(), entry.getValue());
         }
         if (objectsWithInventory.get(Object_name) instanceof Scene) {
-            objectsWithInventory.get(Object_name).getInventory().putOn(ItemBuilder.getIstanceof(item_name));
+            objectsWithInventory.get(Object_name).getInventory().set(ItemBuilder.getIstanceof(item_name));
         } else {
-            objectsWithInventory.get(Object_name).getInventory().putOn(ItemBuilder.getIstanceof(item_name),
+            objectsWithInventory.get(Object_name).getInventory().set(ItemBuilder.getIstanceof(item_name),
                     EquipSlot.valueOf(equip_slot));
         }
     }
@@ -172,21 +174,22 @@ public class Campaign_Engine {
                 + nearbyNPCs;
     }
 
-    public String give(String recipientName, String senderName, EquipSlot slot) throws Exception {
+    public String give(String recipientName, String senderName, String itemName) throws Exception {
         Character matchedRecipient = Levenshtein.fetchCharacter(recipientName, this.getCharacters());
         Character matchedSender = Levenshtein.fetchCharacter(senderName, this.getCharacters());
         if (!matchedRecipient.getScene_is_on().equals(matchedSender.getScene_is_on())) {
 
             throw new Exception("Non puoi dare qualcosa a qualcuno che non si trova vicino a te...");
         } else {
-            Item item = matchedRecipient.getInventory().give(slot);
-            matchedSender.getInventory().take(item);
+            Item item = matchedSender.getInventory().give(itemName);
+            matchedRecipient.getInventory().take(item);
             return matchedRecipient.getName() + "ha dato a " + matchedSender.getName() + " l'oggetto " + item.getName();
         }
 
     }
 
-    public String wear(String recipientName, String item_name, EquipSlot slot) throws Exception {
+    public String wear(String recipientName, String item_name, String slotString) throws Exception {
+        EquipSlot slot=EquipSlot.valueOf(slotString);
         Character matchedCharacter = Levenshtein.fetchCharacter(recipientName, characters);
         Item matchedItem = Levenshtein.fetchItem(item_name, matchedCharacter.getInventory().getItemsOnHands());
         matchedCharacter.getInventory().wear(matchedItem, slot);
@@ -194,13 +197,13 @@ public class Campaign_Engine {
                 + matchedItem.getName();
     }
 
-    public String stowe(String recipientName, String itemName, String equipSlotString) throws Exception {
+    public String stowe(String recipientName, String itemName, String slotString) throws Exception {
         Character matchedCharacter = Levenshtein.fetchCharacter(recipientName, characters);
         Item matchedItem = Levenshtein.fetchItem(itemName, matchedCharacter.getInventory().getItemsOnHands());
-        EquipSlot equipSlot = EquipSlot.valueOf(equipSlotString);
+        EquipSlot equipSlot = EquipSlot.valueOf(slotString);
         matchedCharacter.getInventory().stowe(matchedItem, equipSlot);
         return matchedCharacter.getName() + "ha eseguito l'azione di stowe dell'oggetto" + matchedItem.getName() +
-                " nel container che ha indossato in " + equipSlotString;
+                " nel container che ha indossato in " + equipSlot.toString();
     }
 
     public String retrieveStowedItem(String recipient, String itemName) throws Exception {
@@ -208,5 +211,33 @@ public class Campaign_Engine {
         Item item = matchedCharacter.getInventory().retrieveStowedItem(itemName);
         return matchedCharacter.getName() + " ha recuperato l'oggetto " + item.getName() + " dal suoi container";
     }
+
+    public String drawWeapon(String recipientName,String weaponItemName) throws Exception{
+        Character matchedRecipient=Levenshtein.fetchCharacter(recipientName, characters);
+        Item weaponItem=matchedRecipient.getInventory().drawWeapon(weaponItemName);
+        return matchedRecipient.getName()+" ha estratto l'arma "+weaponItem.getName();
+    }
+
+    public String putAway(String recipientName,String weaponItemName) throws Exception{
+        Character matchedCharacter=Levenshtein.fetchCharacter(recipientName, characters);
+        Item weaponItem=matchedCharacter.getInventory().putAway(weaponItemName);
+        return matchedCharacter.getName()+" ha riposto l'arma "+weaponItem.getName();
+        
+    }
+
+    public String openInventory(String recipientName) throws Exception{
+        Character matchedCharacter=Levenshtein.fetchCharacter(recipientName, characters);
+        String description="";
+        for(Map.Entry<EquipSlot,Item> entry:matchedCharacter.getInventory().getItems_inventory().entrySet()){
+            description+=entry.getValue().getName()+" equipaggiato nello slot "+entry.getKey().toString()+"\n\n";
+        }
+        for(Item weaponItem:matchedCharacter.getInventory().getWeapons()){
+            description+=weaponItem.getName()+" riposta a posto\n\n";
+        }
+        return description;
+        
+    }
+
+
 
 }

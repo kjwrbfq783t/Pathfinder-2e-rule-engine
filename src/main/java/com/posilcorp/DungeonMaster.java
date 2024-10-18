@@ -73,13 +73,27 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
             try {
                 devCampaignCreator.createPc("cosimo", "un guerriero con scudo e spada", "piazza");
                 devCampaignCreator.createPc("antonio", "ladro agile", "piazza");
-
                 devCampaignCreator.createNpc("mario", "un mercante di gioielli", "piazza");
                 devCampaignCreator.createNpc("filippo", "boscaiolo", "foresta");
+                devCampaignCreator.createAndAddItemToObject("spada", "cosimo", "WEAPON_SLOTS");
+                devCampaignCreator.createAndAddItemToObject("zaino", "cosimo", "WEARED_BACK");
+                devCampaignCreator.createAndAddItemToObject("spada", "antonio", "WEAPON_SLOTS");
+                devCampaignCreator.createAndAddItemToObject("zaino", "antonio", "WEARED_BACK");
+                devCampaignCreator.createAndAddItemToObject("spada", "mario", "WEAPON_SLOTS");
+                devCampaignCreator.createAndAddItemToObject("zaino", "mario", "WEARED_BACK");
+                devCampaignCreator.createAndAddItemToObject("spada", "filippo", "WEAPON_SLOTS");
+                devCampaignCreator.createAndAddItemToObject("zaino", "filippo", "WEARED_BACK");
+                
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
             
+
+
+
+
             campaignManagerList.put(update.getMessage().getChatId().toString(), new CampaignManagerIAOpenAi().setCampaign_Engine(
                 devCampaignCreator.getCampaign_Engine()
             ));
@@ -280,7 +294,6 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
                         update.getMessage().getText());
                 SendMessage sendMessage = new SendMessage(update.getMessage().getChatId().toString(), response);
                 sendMessage.setParseMode("Markdown");
-
                 sendMessage.setReplyMarkup(keyboardmarkup);
                 try {
                     telegramClient.execute(sendMessage);

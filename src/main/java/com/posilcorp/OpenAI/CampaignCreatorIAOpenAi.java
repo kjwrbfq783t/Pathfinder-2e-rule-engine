@@ -25,7 +25,6 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorInterface {
     }
 
     private final String url = "https://api.openai.com/v1/chat/completions";
-    private final String api_Token = "Bearer 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";
 
     private JSONArray conversation;
     Campaign_Engine campaign_Engine;
@@ -165,15 +164,16 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorInterface {
         tools.put(createScene_json);
         tools.put(setCampaignName_json);
         data.put("tools", tools);
-        data.put("model", "gpt-4o");
+        data.put("model", "gpt-4o-mini");
     }
 
     public JSONObject performAPICall() throws IOException {
         HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("OpenAI-Project",System.getenv("OPENAI_PROJECT_ID"));
         con.setRequestProperty("Authorization",
-                api_Token);
+        System.getenv("OPENAI_API_KEY"));
         data.put("messages", conversation);
         con.setDoOutput(true);
         con.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
@@ -251,5 +251,8 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorInterface {
 
     public void createScene(String name, String description) {
         campaign_Engine.create_scene(description, name);
+    }
+    public void createAndAddItemToObject(String item_name, String Object_name, String equip_slot) throws Exception{
+        campaign_Engine.createAndAddItemToObject(item_name, Object_name, equip_slot);
     }
 }
