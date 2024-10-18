@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-
 import com.posilcorp.EquipmentLogic.EquipSlot;
 import com.posilcorp.EquipmentLogic.Item;
 import com.posilcorp.EquipmentLogic.ItemBuilder;
@@ -21,59 +20,56 @@ public class Campaign_Engine {
         this.campaign_name = campaign_name;
     }
 
-    public void createAndAddItemToObject(String item_name,String Object_name, String equip_slot)throws Exception{
-        HashMap<String,ObjectWithInventory> objectsWithInventory=new HashMap<String,ObjectWithInventory>();
-        for(Map.Entry<String,Scene> entry:scenes.entrySet()){
+    public void createAndAddItemToObject(String item_name, String Object_name, String equip_slot) throws Exception {
+        HashMap<String, ObjectWithInventory> objectsWithInventory = new HashMap<String, ObjectWithInventory>();
+        for (Map.Entry<String, Scene> entry : scenes.entrySet()) {
             objectsWithInventory.put(entry.getKey(), entry.getValue());
         }
-        for(Map.Entry<String,Character> entry:characters.entrySet()){
+        for (Map.Entry<String, Character> entry : characters.entrySet()) {
             objectsWithInventory.put(entry.getKey(), entry.getValue());
         }
-        if(objectsWithInventory.get(Object_name) instanceof Scene){
-           objectsWithInventory.get(Object_name).getInventory().putOn(ItemBuilder.getIstanceof(item_name));
-        }else{
-            objectsWithInventory.get(Object_name).getInventory().putOn(ItemBuilder.getIstanceof(item_name),EquipSlot.valueOf(equip_slot));
+        if (objectsWithInventory.get(Object_name) instanceof Scene) {
+            objectsWithInventory.get(Object_name).getInventory().putOn(ItemBuilder.getIstanceof(item_name));
+        } else {
+            objectsWithInventory.get(Object_name).getInventory().putOn(ItemBuilder.getIstanceof(item_name),
+                    EquipSlot.valueOf(equip_slot));
         }
     }
 
-
-    public HashMap<String,ObjectYouCanSpeakTo> getObjectYouCanSpeakTos(){
-        HashMap<String,ObjectYouCanSpeakTo> ObjectYouCanSpeakTos=new HashMap<String,ObjectYouCanSpeakTo>();
-        for(Map.Entry<String,Scene> entry:scenes.entrySet()){
+    public HashMap<String, ObjectYouCanSpeakTo> getObjectYouCanSpeakTos() {
+        HashMap<String, ObjectYouCanSpeakTo> ObjectYouCanSpeakTos = new HashMap<String, ObjectYouCanSpeakTo>();
+        for (Map.Entry<String, Scene> entry : scenes.entrySet()) {
             ObjectYouCanSpeakTos.put(entry.getKey(), entry.getValue());
         }
-        for(Map.Entry<String,Character> entry:characters.entrySet()){
+        for (Map.Entry<String, Character> entry : characters.entrySet()) {
             ObjectYouCanSpeakTos.put(entry.getKey(), entry.getValue());
         }
         return ObjectYouCanSpeakTos;
     }
 
-    public HashMap<String,ObjectWithInventory> getObjectWithInventorys(){
-        HashMap<String,ObjectWithInventory> ObjectWithInventorys=new HashMap<String,ObjectWithInventory>();
-        for(Map.Entry<String,Scene> entry:scenes.entrySet()){
+    public HashMap<String, ObjectWithInventory> getObjectWithInventorys() {
+        HashMap<String, ObjectWithInventory> ObjectWithInventorys = new HashMap<String, ObjectWithInventory>();
+        for (Map.Entry<String, Scene> entry : scenes.entrySet()) {
             ObjectWithInventorys.put(entry.getKey(), entry.getValue());
         }
-        for(Map.Entry<String,Character> entry:characters.entrySet()){
+        for (Map.Entry<String, Character> entry : characters.entrySet()) {
             ObjectWithInventorys.put(entry.getKey(), entry.getValue());
         }
         return ObjectWithInventorys;
     }
 
-
-
-    public HashMap<String,Character> getCharacters(){
+    public HashMap<String, Character> getCharacters() {
         return characters;
     }
- 
 
     public HashMap<String, Scene> getScenes() {
         return scenes;
     }
 
     public Collection<Character> getNpc_characthers() {
-        ArrayList<Character> npcs=new ArrayList<Character>();
-        for(Character character:characters.values()){
-            if(character.isNPC){
+        ArrayList<Character> npcs = new ArrayList<Character>();
+        for (Character character : characters.values()) {
+            if (character.isNPC) {
                 npcs.add(character);
             }
         }
@@ -81,9 +77,9 @@ public class Campaign_Engine {
     }
 
     public Collection<Character> getPc_characthers() {
-        ArrayList<Character> pcs=new ArrayList<Character>();
-        for(Character character:characters.values()){
-            if(!character.isNPC){
+        ArrayList<Character> pcs = new ArrayList<Character>();
+        for (Character character : characters.values()) {
+            if (!character.isNPC) {
                 pcs.add(character);
             }
         }
@@ -93,9 +89,11 @@ public class Campaign_Engine {
     public String getCampaign_name() {
         return campaign_name;
     }
- // al costruttore bisogna dare un oggetto classe di tipo NpcAIInterface in modo che poi ne istanzierà la classe.
+
+    // al costruttore bisogna dare un oggetto classe di tipo NpcAIInterface in modo
+    // che poi ne istanzierà la classe.
     public Campaign_Engine() {
-        this.characters=new HashMap<String,Character>();
+        this.characters = new HashMap<String, Character>();
         this.scenes = new HashMap<String, Scene>();
     }
 
@@ -116,7 +114,7 @@ public class Campaign_Engine {
         return "";
     }
 
-public String speak_to(String senderName, String recipientName, String text) throws Exception {
+    public String speak_to(String senderName, String recipientName, String text) throws Exception {
         ObjectYouCanSpeakTo matched_sender = Levenshtein.fetchObjectYouCanSpeakTo(senderName,
                 this.getObjectYouCanSpeakTos());
         ObjectYouCanSpeakTo matched_recipient = Levenshtein.fetchObjectYouCanSpeakTo(recipientName,
@@ -174,50 +172,41 @@ public String speak_to(String senderName, String recipientName, String text) thr
                 + nearbyNPCs;
     }
 
-    public String give(String recipientName,String senderName, EquipSlot slot) throws Exception{
+    public String give(String recipientName, String senderName, EquipSlot slot) throws Exception {
         Character matchedRecipient = Levenshtein.fetchCharacter(recipientName, this.getCharacters());
         Character matchedSender = Levenshtein.fetchCharacter(senderName, this.getCharacters());
-        if(!matchedRecipient.getScene_is_on().equals(matchedSender.getScene_is_on())){
+        if (!matchedRecipient.getScene_is_on().equals(matchedSender.getScene_is_on())) {
 
-        throw new Exception("Non puoi dare qualcosa a qualcuno che non si trova vicino a te...");
-        }else{
-            Item item=matchedRecipient.getInventory().give(slot);
+            throw new Exception("Non puoi dare qualcosa a qualcuno che non si trova vicino a te...");
+        } else {
+            Item item = matchedRecipient.getInventory().give(slot);
             matchedSender.getInventory().take(item);
-            return matchedRecipient.getName()+"ha dato a "+matchedSender.getName()+" l'oggetto "+item.getName();
+            return matchedRecipient.getName() + "ha dato a " + matchedSender.getName() + " l'oggetto " + item.getName();
         }
 
-
-
-        
-        
-
-
     }
 
-    public String wear(String recipientName,String item_name,EquipSlot slot) throws Exception{
-        Character matchedCharacter=Levenshtein.fetchCharacter(recipientName, characters);
-        Item matchedItem=Levenshtein.fetchItem(item_name,matchedCharacter.getInventory().getItemsOnHands());
+    public String wear(String recipientName, String item_name, EquipSlot slot) throws Exception {
+        Character matchedCharacter = Levenshtein.fetchCharacter(recipientName, characters);
+        Item matchedItem = Levenshtein.fetchItem(item_name, matchedCharacter.getInventory().getItemsOnHands());
         matchedCharacter.getInventory().wear(matchedItem, slot);
-        return matchedCharacter.getName()+"ha utilizzato l'azione wear per equipaggiare o mettere a posto l'oggetto "+matchedItem.getName();
+        return matchedCharacter.getName() + "ha utilizzato l'azione wear per equipaggiare o mettere a posto l'oggetto "
+                + matchedItem.getName();
     }
 
-    public String stowe(String recipientName,String itemName,String equipSlotString) throws Exception{     
-        Character matchedCharacter=Levenshtein.fetchCharacter(recipientName, characters);
-        Item matchedItem=Levenshtein.fetchItem(itemName,matchedCharacter.getInventory().getItemsOnHands());
-        EquipSlot equipSlot=EquipSlot.valueOf(equipSlotString);
+    public String stowe(String recipientName, String itemName, String equipSlotString) throws Exception {
+        Character matchedCharacter = Levenshtein.fetchCharacter(recipientName, characters);
+        Item matchedItem = Levenshtein.fetchItem(itemName, matchedCharacter.getInventory().getItemsOnHands());
+        EquipSlot equipSlot = EquipSlot.valueOf(equipSlotString);
         matchedCharacter.getInventory().stowe(matchedItem, equipSlot);
-        return matchedCharacter.getName()+"ha eseguito l'azione di stowe dell'oggetto"+matchedItem.getName()+
-        " nel container che ha indossato in "+equipSlotString;
+        return matchedCharacter.getName() + "ha eseguito l'azione di stowe dell'oggetto" + matchedItem.getName() +
+                " nel container che ha indossato in " + equipSlotString;
     }
 
-    public String retrieveStowedItem(String recipient,String itemName) throws Exception{
-        Character matchedCharacter=Levenshtein.fetchCharacter(itemName, characters);
-        Item item=matchedCharacter.getInventory().retrieveStowedItem(itemName);
-        return matchedCharacter.getName()+" ha recuperato l'oggetto "+item.getName()+" dal suoi container";
+    public String retrieveStowedItem(String recipient, String itemName) throws Exception {
+        Character matchedCharacter = Levenshtein.fetchCharacter(itemName, characters);
+        Item item = matchedCharacter.getInventory().retrieveStowedItem(itemName);
+        return matchedCharacter.getName() + " ha recuperato l'oggetto " + item.getName() + " dal suoi container";
     }
-
 
 }
-
-
-

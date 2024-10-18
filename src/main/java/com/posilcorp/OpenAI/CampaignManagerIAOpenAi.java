@@ -249,15 +249,8 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface {
 
     }
 
-    // non esporre la struttura, reinserire nel campaign engine tutto per
-    // check!!!!!!
     public String speak_to(String senderName, String recipientName, String text) throws Exception {
-        ObjectYouCanSpeakTo matched_sender = Levenshtein.fetchObjectYouCanSpeakTo(senderName,
-                campaign_Engine.getObjectYouCanSpeakTos());
-        ObjectYouCanSpeakTo matched_recipient = Levenshtein.fetchObjectYouCanSpeakTo(recipientName,
-                campaign_Engine.getObjectYouCanSpeakTos());
-        String response = matched_recipient.speak_to(matched_sender, text);
-        return "{\"name\": " + matched_recipient.getName() + ", \"text\":" + response + "}";
+       return campaign_Engine.speak_to(senderName, recipientName, text);
     }
 
     public String changeScene(String recipientName, String sceneName) throws Exception {
@@ -275,9 +268,9 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface {
     public String take(String recipientName, String holderName, String itemName) throws Exception {
         return campaign_Engine.take(recipientName, holderName, itemName);
     }
-
     
 
+    
     public String getEnvironment(String pcName) throws Exception {
         return campaign_Engine.getEnvironment(pcName);
     }
