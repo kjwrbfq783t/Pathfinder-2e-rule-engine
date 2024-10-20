@@ -1,5 +1,6 @@
 package com.posilcorp;
 
+import java.util.Map;
 
 public interface CampaignCreatorInterface {
 
@@ -7,9 +8,9 @@ public interface CampaignCreatorInterface {
 
     public void setCampaignName(String campaign_name);
 
-    public void createPc(String name, String physical_description,String scene_name)throws Exception;
+    public void createPc(String name, String physical_description,String scene_name,int hitPoints)throws Exception;
 
-    public void createNpc(String name,String description, String scene_name)throws Exception;
+    public void createNpc(String name,String description, String scene_name,int hitPoints)throws Exception;
 
     public void createScene(String name, String description);
 

@@ -8,8 +8,7 @@ import java.lang.reflect.Parameter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-
-
+import java.util.Map;
 
 import org.json.JSONArray;
 
@@ -17,6 +16,7 @@ import org.json.JSONObject;
 
 import com.posilcorp.CampaignCreatorInterface;
 import com.posilcorp.Campaign_Engine;
+import com.posilcorp.KeyAttribute;
 
 public class CampaignCreatorIAOpenAi implements CampaignCreatorInterface {
 
@@ -238,19 +238,19 @@ public class CampaignCreatorIAOpenAi implements CampaignCreatorInterface {
     }
 
     public void setCampaignName(String campaign_name) {
-        campaign_Engine.setCampaign_name(campaign_name);
+        campaign_Engine.setCampaignName(campaign_name);
     }
 
-    public void createPc(String name, String physical_description, String scene_name) throws Exception {
-        campaign_Engine.create_Pc(name, physical_description, scene_name);
+    public void createPc(String name, String physical_description, String scene_name,int hitPoints) throws Exception {
+        campaign_Engine.createPc(name, physical_description, scene_name,  hitPoints);
     }
 
-    public void createNpc(String name, String description, String scene_name) throws Exception {
-        campaign_Engine.create_npc(name, description, scene_name);
+    public void createNpc(String name, String description, String scene_name,int hitPoints) throws Exception {
+        campaign_Engine.createNpc(name, description, scene_name,  hitPoints);
     }
 
     public void createScene(String name, String description) {
-        campaign_Engine.create_scene(description, name);
+        campaign_Engine.createScene(description, name);
     }
     public void createAndAddItemToObject(String item_name, String Object_name, String equip_slot) throws Exception{
         campaign_Engine.createAndAddItemToObject(item_name, Object_name, equip_slot);

@@ -1,0 +1,87 @@
+[
+    {
+      "nome": "speak_to",
+      "argomenti": ["senderName", "recipientName", "text"],
+      "descrizione": "initiateConversation: Il personaggio parla con un altro personaggio per fare domande, dare risposte o iniziare una conversazione. Può coinvolgere dialoghi generici, richieste di informazioni o scambi verbali di qualsiasi tipo."
+
+    },
+    {
+      "nome": "changeScene",
+      "argomenti": ["recipientName", "sceneName"],
+      "descrizione": "changescene: Il personaggio si sposta da una scena di gioco a un'altra, rappresentando un cambio di luogo o ambiente. Le scene di gioco possono essere diverse aree geografiche, stanze o ambientazioni, ognuna con nuove opportunità o sfide. Questo cambiamento consente l'esplorazione di nuovi spazi all'interno del mondo di gioco."
+
+    },
+    {
+      "nome": "drawFrom",
+      "argomenti": ["recipientName", "slotName"],
+      "descrizione": "disequipaggiare: togliere, disequipaggiare un item, come ad esempio rimuovere un pezzo di armatura, o uno zaino dal proprio slot di equipaggiamento "
+
+    },
+    {
+      "nome": "take",
+      "argomenti": ["recipientName", "holderName", "itemName"],
+      "descrizione": "Raccogliere: raccogliere un oggetto libero da terra o ad esempio posizionato su uno scaffale"
+
+    },
+    {
+      "nome": "getEnvironment",
+      "argomenti": ["pcName"],
+      "descrizione": "Descrivere ambiente: Il personaggio richiede una descrizione dettagliata dell'ambiente circostante, inclusi gli elementi della scena attuale, come oggetti, caratteristiche del luogo e la presenza di NPC nelle vicinanze. Questa azione fornisce informazioni utili per l'interazione e l'esplorazione del mondo di gioco."
+
+
+    },
+    {
+      "nome": "give",
+      "argomenti": ["recipientName", "senderName", "itemName"],
+      "descrizione": "Dare: dare, passare, restituire un oggetto a un altro personaggio."
+
+    },
+    {
+      "nome": "wear",
+      "argomenti": ["recipientName", "item_name", "slotString"],
+      "descrizione": "Equipaggiare: equipaggiare, indossare un un oggetto."
+
+    },
+    {
+      "nome": "stowe",
+      "argomenti": ["recipientName", "itemName", "slotString"],
+      "descrizione": "Stivare: riporre un oggetto in un container, tipicamente un sacco o uno zaino"
+
+    },
+    {
+      "nome": "retrieveStowedItem",
+      "argomenti": ["recipient", "itemName", "equip_slot"],
+      "descrizione": "Recuperare: recuperare, tirare fuori, cercare e prendere un oggetto riposto in un container, tipicamente uno zaino o un sacco"
+
+    },
+    {
+      "nome": "drawWeapon",
+      "argomenti": ["recipientName", "weaponItemName"],
+      "descrizione": "Estrarre arma: estrarre, sguainare, imbracciare un arma"
+
+    },
+    {
+      "nome": "putAway",
+      "argomenti": ["recipientName", "weaponItemName"],
+      "descrizione": "Riporre arma: riporre arma, rinfoderare un arma, abbassare l'arma"
+
+    },
+    {
+      "nome": "openInventory",
+      "argomenti": ["recipientName"],
+      "descrizione": "Aprire inventario: aprire l'inventario, per conoscere gli oggetti posseduti"
+
+    },
+    {
+      "nome": "changeGrip",
+      "argomenti": ["recipientName"],
+      "descrizione": "Cambia impugnatura: cambiare l'impugnatura di un'arma, ad esempio da una mano a due mani."
+
+    },
+    {
+      "nome": "swap",
+      "argomenti": ["recipientName", "weaponToSwapWith"],
+      "descrizione": "Scambiare arma: scambiare l'arma attualmente impugnata con un'altra."
+
+    }]
+  

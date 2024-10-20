@@ -8,6 +8,7 @@ import org.apache.commons.text.similarity.LevenshteinDistance;
 import com.posilcorp.Character;
 import com.posilcorp.ObjectYouCanSpeakTo;
 import com.posilcorp.Scene;
+import com.posilcorp.EquipmentLogic.EquipSlot;
 import com.posilcorp.EquipmentLogic.Item;
 import com.posilcorp.EquipmentLogic.ObjectWithInventory;
 
@@ -48,7 +49,7 @@ public class Levenshtein {
             }
         }
         if (ObjectWithInventorys.get(matched) == null)
-            throw new Exception("oggeto non trovato..");
+            throw new Exception("oggetto non trovato..");
         return ObjectWithInventorys.get(matched);
     }
 
@@ -68,7 +69,7 @@ public class Levenshtein {
             }
         }
         if (Items.get(matched) == null)
-            throw new Exception("oggeto non trovato..");
+            throw new Exception("oggetto non trovato..");
 
         return Items.get(matched);
     }
@@ -88,7 +89,7 @@ public class Levenshtein {
             }
         }
         if (Characters.get(matched) == null)
-            throw new Exception("oggeto non trovato..");
+            throw new Exception("oggetto non trovato..");
 
         return Characters.get(matched);
     }
@@ -109,7 +110,7 @@ public class Levenshtein {
             }
         }
         if (matched_item == null)
-            throw new Exception("oggeto non trovato..");
+            throw new Exception("oggetto non trovato..");
         return matched_item;
     }
 
@@ -132,5 +133,25 @@ public class Levenshtein {
             throw new Exception("oggeto non trovato..");
         return Scenes.get(matched);
     }
+    public static EquipSlot fetchEquipSlot(String text) throws Exception {
+        Integer best_score = null;
+        EquipSlot matched_EquipSlot = null;
+
+        for (EquipSlot fetched_EquipSlot : EquipSlot.values()) {
+            if (best_score == null) {
+                best_score = LevenshteinDistance.getDefaultInstance().apply(text, fetched_EquipSlot.toString());
+                matched_EquipSlot = fetched_EquipSlot;
+            }
+            int new_score = LevenshteinDistance.getDefaultInstance().apply(text, fetched_EquipSlot.toString());
+            if (new_score < best_score) {
+                matched_EquipSlot = fetched_EquipSlot;
+                best_score = new_score;
+            }
+        }
+        if (matched_EquipSlot == null)
+            throw new Exception("oggetto non trovato..");
+        return matched_EquipSlot;
+    }
+    
 
 }

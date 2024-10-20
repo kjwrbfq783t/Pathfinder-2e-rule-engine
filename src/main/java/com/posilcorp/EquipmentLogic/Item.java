@@ -2,7 +2,7 @@ package com.posilcorp.EquipmentLogic;
 
 import java.util.ArrayList;
 
-public abstract class Item {
+public class Item {
 
     private static IDGen idgen=new IDGen();
     private int bulk;

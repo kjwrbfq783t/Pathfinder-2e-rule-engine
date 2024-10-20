@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.posilcorp.EquipmentLogic.EquipSlot;
-import com.posilcorp.EquipmentLogic.Inventory;
 import com.posilcorp.EquipmentLogic.Item;
 import com.posilcorp.EquipmentLogic.ItemBuilder;
 import com.posilcorp.EquipmentLogic.ObjectWithInventory;
+import com.posilcorp.EquipmentLogic.WeaponItem;
 import com.posilcorp.Utilities.Levenshtein;
 
 public class Campaign_Engine {
@@ -17,7 +17,7 @@ public class Campaign_Engine {
     private HashMap<String, Character> characters;
     private HashMap<String, Scene> scenes;
 
-    public void setCampaign_name(String campaign_name) {
+    public void setCampaignName(String campaign_name) {
         this.campaign_name = campaign_name;
     }
 
@@ -88,7 +88,7 @@ public class Campaign_Engine {
         return pcs;
     }
 
-    public String getCampaign_name() {
+    public String getCampaignName() {
         return campaign_name;
     }
 
@@ -99,19 +99,19 @@ public class Campaign_Engine {
         this.scenes = new HashMap<String, Scene>();
     }
 
-    public void create_Pc(String name, String phisical_description, String scene_name) {
-        Character pc = new Pc_character(name, phisical_description, this.getScenes().get(scene_name));
+    public void createPc(String name, String phisical_description, String scene_name,int hitPoints) {
+        Character pc = new Pc_character(name, phisical_description, this.getScenes().get(scene_name), hitPoints);
         this.getScenes().get(scene_name).addCharacter(pc);
         characters.put(name, pc);
     }
 
-    public void create_npc(String name, String description, String scene_name) {
-        Character npc = new Npc_character(name, description, this.getScenes().get(scene_name));
+    public void createNpc(String name, String description, String scene_name,int hitPoints) {
+        Character npc = new Npc_character(name, description, this.getScenes().get(scene_name), hitPoints);
         this.getScenes().get(scene_name).addCharacter(npc);
         characters.put(npc.getName(), npc);
     }
 
-    public String create_scene(String scene_description, String name) {
+    public String createScene(String scene_description, String name) {
         scenes.put(name, new Scene(scene_description, name));
         return "";
     }
@@ -183,7 +183,7 @@ public class Campaign_Engine {
         } else {
             Item item = matchedSender.getInventory().give(itemName);
             matchedRecipient.getInventory().take(item);
-            return matchedRecipient.getName() + "ha dato a " + matchedSender.getName() + " l'oggetto " + item.getName();
+            return matchedRecipient.getName() + "ha ricevuto da " + matchedSender.getName() + " l'oggetto " + item.getName();
         }
 
     }
@@ -206,9 +206,10 @@ public class Campaign_Engine {
                 " nel container che ha indossato in " + equipSlot.toString();
     }
 
-    public String retrieveStowedItem(String recipient, String itemName) throws Exception {
-        Character matchedCharacter = Levenshtein.fetchCharacter(itemName, characters);
-        Item item = matchedCharacter.getInventory().retrieveStowedItem(itemName);
+    public String retrieveStowedItem(String recipient, String itemName,String equip_slot) throws Exception {
+        Character matchedCharacter = Levenshtein.fetchCharacter(recipient, characters);
+        EquipSlot matchedEquipSlot=Levenshtein.fetchEquipSlot(equip_slot);
+        Item item = matchedCharacter.getInventory().retrieveStowedItem(itemName,matchedEquipSlot);
         return matchedCharacter.getName() + " ha recuperato l'oggetto " + item.getName() + " dal suoi container";
     }
 
@@ -237,6 +238,42 @@ public class Campaign_Engine {
         return description;
         
     }
+
+    public String changeGrip(String recipientName) throws Exception{
+        Character matchedCharacter=Levenshtein.fetchCharacter(recipientName, characters);
+        Item weaponItem=matchedCharacter.getInventory().changeGrip();
+        if(weaponItem==null){
+            return matchedCharacter.getName()+" impugna la propria arma a 2 mani";
+        }else{
+            return matchedCharacter.getName()+" impugna la propria arma ad 1 mano";
+        }
+    }
+
+    public String swap(String recipientName,String weaponToSwapWith) throws Exception{
+        Character matchedCharacter=Levenshtein.fetchCharacter(recipientName, characters);
+        ArrayList<Item> swappedItems=matchedCharacter.getInventory().swap(weaponToSwapWith);
+        return matchedCharacter.getName()+" ha scambiato con successo "+swappedItems.get(0).getName()+" con "+swappedItems.get(1).getName();
+    }
+
+    public String attack(String senderName,String recipientName,String weaponItem) throws Exception{
+        Character matchedsender=Levenshtein.fetchCharacter(senderName, characters);
+        Character matchedRecipient=Levenshtein.fetchCharacter(recipientName, characters);
+        WeaponItem weapon=matchedsender.getInventory().weaponToAttackWith(weaponItem);
+        int attackRoll=matchedRecipient.getAttackRoll();
+        int damage=0;
+        String response="";
+        if(attackRoll>16){
+            damage=weapon.getBaseDamage();
+            response=matchedRecipient.applyDealtDamage(damage,matchedsender.getName());
+        }
+        return matchedRecipient.getName()+"ha inflitto con "+weapon.getName()+" "+damage+" danni di tipo "+weapon.damageType.toString()+" a "+matchedRecipient.getName()
+        +matchedRecipient.getName()+"risponde con: "+response;
+
+
+
+    }
+
+
 
 
 

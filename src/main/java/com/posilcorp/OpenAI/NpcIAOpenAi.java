@@ -56,6 +56,30 @@ public class NpcIAOpenAi implements NpcIAInterface {
         conversation.put(new JSONObject().put("role", "assistant").put("content", response));
         return response;
     }
+    public String reactToAttack(String dealerName) throws IOException{
+        String url = "https://api.openai.com/v1/chat/completions";
+        HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("Authorization",
+                "Bearer " + api_token);
+        con.setRequestProperty("OpenAI-Project", "proj_CCAWMJmb5LiimSbyUq3vmEeR");
+        JSONObject data = new JSONObject();
+        data.put("model", "gpt-4o");
+        conversation.put(new JSONObject().put("role", "user").put("content", dealerName + " ti attacco con la mia arma!"));
+        data.put("messages", conversation);
+        con.setDoOutput(true);
+
+        con.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
+        BufferedReader buff = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
+        String output = buff.lines().reduce((a, b) -> a + b).get();
+        buff.close();
+        String response = new JSONObject(output).getJSONArray("choices").getJSONObject(0).getJSONObject("message").toString();
+
+        conversation.put(new JSONObject().put("role", "assistant").put("content", response));
+        return response;
+        
+    }
 
     @Override
     public void updateScene(String scene_description,String scene_name) {

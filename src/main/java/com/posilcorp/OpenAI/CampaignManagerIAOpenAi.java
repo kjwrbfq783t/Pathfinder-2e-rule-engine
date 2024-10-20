@@ -10,12 +10,10 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.posilcorp.CampaignManagerInterface;
 import com.posilcorp.Campaign_Engine;
-import com.posilcorp.EquipmentLogic.EquipSlot;
 
 public class CampaignManagerIAOpenAi implements CampaignManagerInterface {
     private final String url = "https://api.openai.com/v1/chat/completions";
@@ -31,38 +29,57 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface {
         data = new JSONObject();
         conversation = new JSONArray();
         JSONArray tools = new JSONArray();
-        String systemMessage= "Sei un Game Master virtuale per un'avventura di ruolo. Il tuo compito è esclusivamente invocare le funzioni definite nel JSON array 'tools' per rispondere alle richieste dei giocatori. Non devi improvvisare o inventare nulla, limitandoti a interpretare l'ambiente e le azioni in base alle funzioni disponibili. Dopo aver ricevuto l'output delle funzioni, dovrai interpretarlo e formattarlo in Markdown per essere utilizzato in una chat Telegram, aggiungendo emoji per rendere l'esperienza più coinvolgente.\n" +
+        String systemMessage = "Sei un Game Master virtuale per un'avventura di ruolo. Il tuo compito è esclusivamente invocare le funzioni definite nel JSON array 'tools' per rispondere alle richieste dei giocatori. Non devi improvvisare o inventare nulla, limitandoti a interpretare l'ambiente e le azioni in base alle funzioni disponibili. Dopo aver ricevuto l'output delle funzioni, dovrai interpretarlo e presentarlo in maniera coinvolgente, utilizza discorsi diretti in prima persona! aggiungendo emoji dove appropriato per arricchire l'esperienza dei giocatori.\n"
+                +
                 "\n" +
                 "Usa le seguenti funzioni per ogni richiesta dei giocatori:\n" +
                 "\n" +
-                "- **getEnvironment(nome_pg)**: Usa questa funzione per fornire la descrizione dell'ambiente in cui si trova un personaggio specifico (nome_pg). Formatta la risposta in Markdown, ad esempio con *testo in corsivo* o **testo in grassetto**, e includi emoji appropriate come 🌲 o 🏰 a seconda dell'ambiente descritto.\n" +
+                "- **getEnvironment(nome_pg)**: Usa questa funzione per fornire la descrizione dell'ambiente in cui si trova un personaggio specifico (nome_pg). Includi emoji appropriate come 🌲 o 🏰 a seconda dell'ambiente descritto.\n"
+                +
                 "\n" +
-                "- **changeScene(recipient, sceneName)**: Usa questa funzione quando un personaggio vuole cambiare scena. 'recipient' è il nome del personaggio e 'sceneName' è il nome della scena in cui vuole andare. Fornisci un output ben formattato, ad esempio: \"⚔️ **[Nome_PG] si sposta nella scena [Nome_Scena]**\".\n" +
+                "- **changeScene(recipient, sceneName)**: Usa questa funzione quando un personaggio vuole cambiare scena. 'recipient' è il nome del personaggio e 'sceneName' è il nome della scena in cui vuole andare. Esempio: \"⚔️ [Nome_PG] si sposta nella scena [Nome_Scena]\".\n"
+                +
                 "\n" +
-                "- **speak_to(sender, recipient, text)**: Usa questa funzione quando un personaggio vuole parlare a un'NPC o parlare al vuoto nella scena. 'sender' è il nome del personaggio, 'recipient' è il nome dell'NPC o della scena e 'text' è il messaggio che il personaggio vuole dire. Rispondi in Markdown, ad esempio: \"🗣️ *[Nome_PG] dice a [Nome_NPC]: '[Testo]'*\".\n" +
+                "- **speak_to(sender, recipient, text)**: Usa questa funzione quando un personaggio vuole parlare a un NPC o parlare al vuoto nella scena. 'sender' è il nome del personaggio, 'recipient' è il nome dell'NPC o della scena, e 'text' è il messaggio che il personaggio vuole dire. Esempio: \"🗣️ [Nome_PG] dice a [Nome_NPC]: '[Testo]'\".\n"
+                +
                 "\n" +
-                "- **getKnowScenes()**: Usa questa funzione per fornire una lista delle scene conosciute nel gioco. Presenta la lista formattata in Markdown con delle emoji, ad esempio: \"🌍 **Scene Disponibili**: 1. 🏞️ Foresta Incantata 2. 🏰 Castello Antico 3. 🏙️ Villaggio Medievale\".\n" +
+                "- **getKnowScenes()**: Usa questa funzione per fornire una lista delle scene conosciute nel gioco. Presenta la lista con delle emoji. Esempio: \"🌍 Scene Disponibili: 1. 🏞️ Foresta Incantata 2. 🏰 Castello Antico 3. 🏙️ Villaggio Medievale\".\n"
+                +
                 "\n" +
-                "- **drawWeapon(recipientName, weaponItemName)**: Usa questa funzione quando un personaggio vuole estrarre un'arma. Rispondi in Markdown, ad esempio: \"🗡️ **[Nome_PG] estrae [Nome_Arma]**\".\n" +
+                "- **drawWeapon(recipientName, weaponItemName)**: Usa questa funzione quando un personaggio vuole estrarre un'arma. Esempio: \"🗡️ [Nome_PG] estrae [Nome_Arma]\".\n"
+                +
                 "\n" +
-                "- **putAway(recipientName, weaponItemName)**: Usa questa funzione quando un personaggio vuole rimettere a posto un'arma. Rispondi in Markdown, ad esempio: \"🔫 **[Nome_PG] rimette a posto [Nome_Arma]**\".\n" +
+                "- **putAway(recipientName, weaponItemName)**: Usa questa funzione quando un personaggio vuole rimettere a posto un'arma. Esempio: \"🔫 [Nome_PG] rimette a posto [Nome_Arma]\".\n"
+                +
                 "\n" +
-                "- **openInventory(recipientName)**: Usa questa funzione quando un personaggio vuole aprire il suo inventario per scoprire cosa possiede. Rispondi in Markdown, ad esempio: \"🎒 **[Nome_PG] apre il suo inventario**\".\n" +
+                "- **openInventory(recipientName)**: Usa questa funzione quando un personaggio vuole aprire il suo inventario per scoprire cosa possiede. Esempio: \"🎒 [Nome_PG] apre il suo inventario\".\n"
+                +
                 "\n" +
-                "- **retrieveStowedItem(recipientName, itemName)**: Usa questa funzione quando un personaggio vuole recuperare un oggetto stivato in uno dei suoi contenitori. Rispondi in Markdown, ad esempio: \"📦 **[Nome_PG] recupera [Nome_Oggetto]**\".\n" +
+                "- **retrieveStowedItem(recipientName, itemName,equipslot)**: Usa questa funzione quando un personaggio vuole recuperare un oggetto stivato in uno dei suoi contenitori in equipslot. Esempio: \"📦 [Nome_PG] recupera [Nome_Oggetto]\".\n"
+                +
                 "\n" +
-                "- **stowe(recipientName, itemName, slot)**: Usa questa funzione quando un personaggio vuole stivare un oggetto in un container che si trova nello slot indicato (ad esempio, uno zaino). Rispondi in Markdown, ad esempio: \"🧳 **[Nome_PG] stiva [Nome_Oggetto] nello slot [Nome_Slot]**\".\n" +
+                "- **stowe(recipientName, itemName, slot)**: Usa questa funzione quando un personaggio vuole stivare un oggetto in un container che si trova nello slot indicato (ad esempio, uno zaino). Esempio: \"🧳 [Nome_PG] stiva [Nome_Oggetto] nello slot [Nome_Slot]\".\n"
+                +
                 "\n" +
-                "- **wear(recipientName, item_name, slot)**: Usa questa funzione quando un personaggio vuole indossare un oggetto nell'EquipSlot indicato. Rispondi in Markdown, ad esempio: \"👕 **[Nome_PG] indossa [Nome_Oggetto] nello slot [Nome_Slot]**\".\n" +
+                "- **wear(recipientName, item_name, slot)**: Usa questa funzione quando un personaggio vuole indossare un oggetto nell'EquipSlot indicato. Esempio: \"👕 [Nome_PG] indossa [Nome_Oggetto] nello slot [Nome_Slot]\".\n"
+                +
                 "\n" +
-                "- **give(recipientName, senderName, itemName)**: Usa questa funzione quando un personaggio vuole dare un oggetto a un altro personaggio. Rispondi in Markdown, ad esempio: \"🎁 **[Nome_PG] dà [Nome_Oggetto] a [Nome_Altro_PG]**\".\n" +
+                "- **give(recipientName, senderName, itemName)**: Usa questa funzione quando un personaggio vuole dare un oggetto a un altro personaggio. Esempio: \"🎁 [Nome_PG] dà [Nome_Oggetto] a [Nome_Altro_PG]\".\n"
+                +
                 "\n" +
-                "- **take(recipientName, holderName, itemName)**: Usa questa funzione quando un personaggio vuole prendere un oggetto da un altro personaggio. Rispondi in Markdown, ad esempio: \"🤲 **[Nome_PG] prende [Nome_Oggetto] da [Nome_Titolare]**\".\n" +
+                "- **take(recipientName, holderName, itemName)**: Usa questa funzione quando un personaggio vuole prendere un oggetto da un altro personaggio. Esempio: \"🤲 [Nome_PG] prende [Nome_Oggetto] da [Nome_Titolare]\".\n"
+                +
                 "\n" +
-                "- **drawFrom(recipientName, slotName)**: Usa questa funzione quando un personaggio vuole dis-equipaggiare o disindossare qualcosa che si trova nello slot specificato. Rispondi in Markdown, ad esempio: \"🔄 **[Nome_PG] dis-equipaggia l'oggetto dallo slot [Nome_Slot]**\".\n" +
+                "- **drawFrom(recipientName, slotName)**: Usa questa funzione quando un personaggio vuole rimuovere o disequipaggiare un oggetto da uno slot specifico. Esempio: \"🧤 [Nome_PG] rimuove un oggetto dallo slot [Nome_Slot]\".\n"
+                +
                 "\n" +
-                "Il tuo unico obiettivo è rispondere alle azioni dei giocatori attraverso queste funzioni. Interpreta e formatta ogni output con Markdown e emoji per adattarlo a una chat Telegram. Non devi aggiungere descrizioni extra o improvvisare. Tutto deve essere strettamente legato alle funzioni disponibili.";
-
+                "- **changeGrip(recipientName)**: Usa questa funzione quando un personaggio vuole cambiare l'impugnatura della sua arma da una mano a due mani, o viceversa. Esempio: \"✋ [Nome_PG] cambia l'impugnatura dell'arma\".\n"
+                +
+                "\n" +
+                "- **swap(recipientName, weaponToSwapWith)**: Usa questa funzione quando un personaggio vuole scambiare l'arma che ha in mano con un'altra arma specifica. Esempio: \"🔄 [Nome_PG] scambia la sua arma con [Nome_Arma_Scambio]\".\n"
+                +
+                "\n" +
+                "Il tuo unico obiettivo è rispondere alle azioni dei giocatori attraverso queste funzioni. Presenta ogni output con emoji per adattarlo a una chat Telegram. Non devi aggiungere descrizioni extra o improvvisare. Tutto deve essere strettamente legato alle funzioni disponibili.";
 
         system_instruction_json = new JSONObject().put("role", "system").put("content", systemMessage);
         String speak_to = "{\n" +
@@ -286,7 +303,22 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface {
                 "        \"itemName\": {\n" +
                 "          \"type\": \"string\",\n" +
                 "          \"description\": \"The name of the item being retrieved\"\n" +
-                "        }\n" +
+                "        },\n" + // Manca una virgola qui
+                "        \"slot\": {\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"enum\": [\n" +
+                "            \"WEARED_SX_HAND\",\n" +
+                "            \"WEARED_DX_HAND\",\n" +
+                "            \"WEARED_TORSO\",\n" +
+                "            \"WEARED_UNDERCOAT\",\n" +
+                "            \"WEARED_BOOTS\",\n" +
+                "            \"WEARED_HEAD\",\n" +
+                "            \"WEARED_BELT\",\n" +
+                "            \"WEARED_BACK\",\n" +
+                "            \"WEARED_VITA\"\n" +
+                "          ],\n" +
+                "          \"description\": \"The slot where the container is located\"\n" +
+                "        }\n" + // Chiusura corretta del blocco "slot"
                 "      },\n" +
                 "      \"required\": [\"recipientName\", \"itemName\"]\n" +
                 "    }\n" +
@@ -388,6 +420,81 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface {
                 "    }\n" +
                 "  }\n" +
                 "}";
+        String changeGrip = "{\n" +
+                "  \"type\": \"function\",\n" +
+                "  \"function\": {\n" +
+                "    \"name\": \"changeGrip\",\n" +
+                "    \"description\": \"Represents the action of a character changing the grip of their weapon from one hand to two hands and vice versa.\",\n"
+                +
+                "    \"parameters\": {\n" +
+                "      \"type\": \"object\",\n" +
+                "      \"properties\": {\n" +
+                "        \"recipientName\": {\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"description\": \"The name of the character changing the grip of their weapon\"\n" +
+                "        }\n" +
+                "      },\n" +
+                "      \"required\": [\"recipientName\"]\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+        String swap = "{\n" +
+                "  \"type\": \"function\",\n" +
+                "  \"function\": {\n" +
+                "    \"name\": \"swap\",\n" +
+                "    \"description\": \"Represents the action of a character swapping the weapon they are holding with another specified weapon.\",\n"
+                +
+                "    \"parameters\": {\n" +
+                "      \"type\": \"object\",\n" +
+                "      \"properties\": {\n" +
+                "        \"recipientName\": {\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"description\": \"The name of the character swapping their weapon\"\n" +
+                "        },\n" +
+                "        \"weaponToSwapWith\": {\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"description\": \"The name of the weapon the character is swapping with\"\n" +
+                "        }\n" +
+                "      },\n" +
+                "      \"required\": [\"recipientName\", \"weaponToSwapWith\"]\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+        String attack = "{\n" +
+                "  \"type\": \"function\",\n" +
+                "  \"function\": {\n" +
+                "    \"name\": \"attack\",\n" +
+                "    \"description\": \"Represents the action of a character attacking another character with a specific weapon.\",\n"
+                +
+                "    \"parameters\": {\n" +
+                "      \"type\": \"object\",\n" +
+                "      \"properties\": {\n" +
+                "        \"senderName\": {\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"description\": \"The name of the character performing the attack\"\n" +
+                "        },\n" +
+                "        \"recipientName\": {\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"description\": \"The name of the character being attacked\"\n" +
+                "        },\n" +
+                "        \"weaponItem\": {\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"description\": \"The name of the weapon used to perform the attack\"\n" +
+                "        }\n" +
+                "      },\n" +
+                "      \"required\": [\"senderName\", \"recipientName\", \"weaponItem\"]\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+
+        JSONObject attack_json = new JSONObject(attack);
+        tools.put(attack_json);
+
+        JSONObject swap_json = new JSONObject(swap);
+        tools.put(swap_json);
+
+        JSONObject changeGrip_json = new JSONObject(changeGrip);
+        tools.put(changeGrip_json);
 
         JSONObject drawFrom_json = new JSONObject(drawFrom);
         tools.put(drawFrom_json);
@@ -434,10 +541,10 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface {
     public JSONObject performAPICall() throws IOException {
         HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
         con.setRequestMethod("POST");
-        con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-        con.setRequestProperty("OpenAI-Project",System.getenv("OPENAI_PROJECT_ID"));
+        con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("OpenAI-Project", System.getenv("OPENAI_PROJECT_ID"));
         con.setRequestProperty("Authorization",
-        "Bearer "+System.getenv("OPENAI_API_KEY"));
+                "Bearer " + System.getenv("OPENAI_API_KEY"));
         data.put("messages", conversation);
         con.setDoOutput(true);
         con.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
@@ -481,9 +588,9 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface {
                                         .cast(arguments_json.get(parameters[j].getName()));
                             }
 
-                            Object execution_result=method.invoke(this, arguments);
+                            Object execution_result = method.invoke(this, arguments);
                             conversation.put(new JSONObject().put("role", "tool")
-                                    .put("content", (String)execution_result)
+                                    .put("content", (String) execution_result)
                                     .put("tool_call_id", tool_call.getString("id")));
                         }
                     }
@@ -495,16 +602,17 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Throwable thrownException=e.getCause();
+            Throwable thrownException = e.getCause();
             conversation = conversation_aux;
-            if(thrownException!=null) {
+            if (thrownException != null) {
                 return "Errore: " + thrownException.getMessage();
-            }else{
+            } else {
                 return "Errore: " + e.getMessage();
             }
         }
 
     }
+
     public CampaignManagerIAOpenAi setCampaign_Engine(Campaign_Engine campaign_Engine) {
         this.campaign_Engine = campaign_Engine;
         return this;
@@ -548,8 +656,8 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface {
         return campaign_Engine.stowe(recipientName, itemName, slot);
     }
 
-    public String retrieveStowedItem(String recipientName, String itemName) throws Exception {
-        return campaign_Engine.retrieveStowedItem(recipientName, itemName);
+    public String retrieveStowedItem(String recipientName, String itemName, String equipSlot) throws Exception {
+        return campaign_Engine.retrieveStowedItem(recipientName, itemName, equipSlot);
     }
 
     public String drawWeapon(String recipientName, String weaponItemName) throws Exception {
@@ -564,4 +672,15 @@ public class CampaignManagerIAOpenAi implements CampaignManagerInterface {
         return campaign_Engine.openInventory(recipientName);
     }
 
+    public String changeGrip(String recipientName) throws Exception {
+        return campaign_Engine.changeGrip(recipientName);
+    }
+
+    public String swap(String recipientName, String weaponToSwapWith) throws Exception {
+        return campaign_Engine.swap(recipientName, weaponToSwapWith);
+    }
+
+    public String attack(String senderName, String recipientName, String weaponItem) throws Exception {
+        return campaign_Engine.attack(senderName, recipientName, weaponItem);
+    }
 }

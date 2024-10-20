@@ -29,11 +29,12 @@ public class StowingItem extends Item {
         return total;
     }
 
-    public void takeOut(Item item) throws Exception {
+    public Item takeOut(Item item) throws Exception {
         if (!items.contains(item)) {
             throw new Exception("item non trovato");
         } else {
             items.remove(item);
+            return item;
         }
     }
 
