@@ -110,21 +110,22 @@ public class CampaignManagerIAOpenAi {
     }
 
     public String interact(String name, String message) {
+        return "peto";
 
-        try {
-            double[] embedding = getEmbedding(message);
-            FunctionEmbeddingMatcher.FunctionData functionData = FunctionEmbeddingMatcher.fetchFunction(embedding);
-            JSONObject functionCall=performAPICall(name+": "+message+"| "+functionData.functionName+functionData.functionArgs);
-            return functionCall.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Throwable thrownException = e.getCause();
-            if (thrownException != null) {
-                return "Errore: " + thrownException.getMessage();
-            } else {
-                return "Errore: " + e.getMessage();
-            }
-        }
+        // try {
+        //     double[] embedding = getEmbedding(message);
+        //     FunctionEmbeddingMatcher.FunctionData functionData = FunctionEmbeddingMatcher.fetchFunction(embedding);
+        //     JSONObject functionCall=performAPICall(name+": "+message+"| "+functionData.functionName+functionData.functionArgs);
+        //     return functionCall.toString();
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        //     Throwable thrownException = e.getCause();
+        //     if (thrownException != null) {
+        //         return "Errore: " + thrownException.getMessage();
+        //     } else {
+        //         return "Errore: " + e.getMessage();
+        //     }
+        // }
         /*
          * JSONArray conversation_aux = new JSONArray(conversation.toString());
          * try {

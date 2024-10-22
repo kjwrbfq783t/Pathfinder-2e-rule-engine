@@ -12,7 +12,7 @@ public class App {
     public static void main(String[] args) {
         try {
             FunctionEmbeddingMatcher.loadCSV();
-            String botToken = "7957732855:AAFRFb6x5XxgfaT1837wRg_ZDYaS4xky5xY";
+            String botToken = System.getenv("TELEGRAM_BOT_TOKEN");
             TelegramBotsLongPollingApplication botsApplication = new TelegramBotsLongPollingApplication();
             DungeonMaster myBot = new DungeonMaster();
             botsApplication.registerBot(botToken, myBot);

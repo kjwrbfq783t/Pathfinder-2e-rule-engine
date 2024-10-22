@@ -15,6 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup.ReplyKeyboardMarkupBuilder;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -289,19 +290,17 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
 
                 InlineKeyboardRow keyboard = new InlineKeyboardRow();
                 InlineKeyboardButton button = new InlineKeyboardButton("Esci");
-                InlineKeyboardButton button2 = new InlineKeyboardButton("app");
-                button2.setWebApp(new WebAppInfo("https://kjwrbfq783t.github.io/Pathfinder-2e-rule-engine/"));
                 button.setCallbackData("quit");
                 keyboard.add(button);
-                keyboard.add(button2);
                 List<InlineKeyboardRow> keyboards = new ArrayList<InlineKeyboardRow>();
                 keyboards.add(keyboard);
                 InlineKeyboardMarkup keyboardmarkup = new InlineKeyboardMarkup(keyboards);
 
 
                 KeyboardRow keyboardRow=new KeyboardRow();
-                KeyboardButton kbutton1=new KeyboardButton("apri inventa2rio");
+                KeyboardButton kbutton1=new KeyboardButton("apri invenhghta2rio");
                 KeyboardButton kbutton2=new KeyboardButton("apri app");
+               
                 kbutton2.setWebApp(new WebAppInfo("https://kjwrbfq783t.github.io/Pathfinder-2e-rule-engine/"));
 
                 keyboardRow.add(kbutton1);
@@ -309,14 +308,16 @@ public class DungeonMaster implements LongPollingSingleThreadUpdateConsumer {
                 List<KeyboardRow> keyboardRowList=new ArrayList<>();
                 keyboardRowList.add(keyboardRow);
                 ReplyKeyboardMarkup replyKeyboardMarkup=new ReplyKeyboardMarkup(keyboardRowList);
-
+                replyKeyboardMarkup.setOneTimeKeyboard(true);
+  
 
                 String response = campaignManager.interact(update.getMessage().getFrom().getFirstName(),
                         update.getMessage().getText());
                 SendMessage sendMessage = new SendMessage(update.getMessage().getChatId().toString(), response);
-                sendMessage.setReplyToMessageId(update.getMessage().getMessageId());
                 sendMessage.setReplyMarkup(replyKeyboardMarkup);
-                sendMessage.setReplyMarkup(keyboardmarkup);
+                //sendMessage.setReplyMarkup(keyboardmarkup);
+                
+                ReplyKeyboardRemove rm=new ReplyKeyboardRemove(true);
                 try {
                     telegramClient.execute(sendMessage);
                 } catch (TelegramApiException e) {
