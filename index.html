@@ -92,6 +92,7 @@
     </div>
 
     <script>
+        const tg = window.Telegram.WebApp;
         const actions = {
             attack: {
                 title: "Attaccare",
@@ -129,15 +130,14 @@
                 document.getElementById('actionDescription').innerText = action.description;
 
                 // Invia il messaggio al bot di Telegram
-                window.Telegram.WebApp.sendData(action.message);
+                tg.sendData(action.title);
 
                 document.getElementById('actionDetails').style.display = 'block';
             });
         });
 
         // Inizializza la Web App di Telegram
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        
     </script>
 </body>
 </html>
