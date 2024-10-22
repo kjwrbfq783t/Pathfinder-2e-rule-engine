@@ -1,0 +1,32 @@
+{
+    "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "functionCall",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "argumentValues": {
+                        "type": "array",
+                        "parameters": {
+                            "type":"object",
+                            "properties":{
+                                "parameterName":{"type":"string"},
+                                "parameterValue":{"type":"string"}
+                            }
+                        }
+                    },
+                    "isValid": {
+                        "type": "boolean",
+                        "description":"false if the function in the message doesn't match the message"
+                    }
+                },
+                "required": [
+                    "argumentValues",
+                    "isValid"
+                ],
+                "additionalProperties": false
+            }
+        }
+    }
+}

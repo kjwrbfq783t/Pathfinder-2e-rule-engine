@@ -22,22 +22,26 @@
   <artifactId>telegrambots-longpolling</artifactId>
   <version>7.10.0</version>
 </dependency>
+
 <dependency>
   <groupId>org.telegram</groupId>
   <artifactId>telegrambots-client</artifactId>
   <version>7.10.0</version>
 </dependency>
+
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-lang3</artifactId>
     <version>3.12.0</version>
 </dependency>
 <!-- https://mvnrepository.com/artifact/org.json/json -->
+
 <dependency>
     <groupId>org.json</groupId>
     <artifactId>json</artifactId>
     <version>20240303</version>
 </dependency><!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
+
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-text</artifactId>
@@ -47,10 +51,21 @@
 
 
 <dependency>
-  <groupId>com.spotify</groupId>
-  <artifactId>annoy</artifactId>
-  <version>0.2.6</version>
+    <groupId>com.opencsv</groupId>
+    <artifactId>opencsv</artifactId>
+    <version>5.5.2</version>
 </dependency>
+
+<dependency>
+    <groupId>org.ejml</groupId>
+    <artifactId>ejml-simple</artifactId>
+    <version>0.41</version>
+</dependency>
+
+  
+
+
+
   </dependencies>
 
  

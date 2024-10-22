@@ -1,15 +1,18 @@
 package com.posilcorp;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.opencsv.exceptions.CsvValidationException;
 import com.posilcorp.EquipmentLogic.EquipSlot;
 import com.posilcorp.EquipmentLogic.Item;
 import com.posilcorp.EquipmentLogic.ItemBuilder;
 import com.posilcorp.EquipmentLogic.ObjectWithInventory;
 import com.posilcorp.EquipmentLogic.WeaponItem;
+import com.posilcorp.Utilities.FunctionEmbeddingMatcher;
 import com.posilcorp.Utilities.Levenshtein;
 
 public class Campaign_Engine {
@@ -94,7 +97,7 @@ public class Campaign_Engine {
 
     // al costruttore bisogna dare un oggetto classe di tipo NpcAIInterface in modo
     // che poi ne istanzierà la classe.
-    public Campaign_Engine() {
+    public Campaign_Engine() throws CsvValidationException, NumberFormatException, IOException {
         this.characters = new HashMap<String, Character>();
         this.scenes = new HashMap<String, Scene>();
     }

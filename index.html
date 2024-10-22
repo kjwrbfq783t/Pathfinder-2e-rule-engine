@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World - Telegram Mini Web App</title>
+    <!-- Telegram Web App script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            color: #0088cc;
+        }
+
+        p {
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        #mainButton {
+            padding: 10px 20px;
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+
+        #mainButton:hover {
+            background-color: #0077bb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hello World!</h1>
+    <p>Benvenuto nella mia Mini Web App integrata in Telegram.</p>
+    <button id="mainButton">Clicca per inviare un messaggio</button>
+
+    <script>
+        // Inizializza l'API Telegram
+        const tg = window.Telegram.WebApp;
+
+        // Espandi la Web App a schermo intero
+        tg.expand();
+
+        // Aggiungi un handler per il pulsante "Clicca per inviare un messaggio"
+        const button = document.getElementById("mainButton");
+        button.addEventListener("click", function() {
+            tg.sendData("Hello World!"); // Invia "Hello World!" al bot
+            tg.MainButton.text = "Messaggio inviato!";
+            tg.MainButton.show(); // Mostra il pulsante principale di Telegram
+        });
+
+        // Opzionale: chiudi la Mini Web App quando il pulsante principale viene cliccato
+        tg.MainButton.onClick(function() {
+            tg.close(); // Chiudi la Web App
+        });
+    </script>
+</body>
+</html>
