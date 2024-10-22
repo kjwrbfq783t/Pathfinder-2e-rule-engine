@@ -3,67 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World - Telegram Mini Web App</title>
-    <!-- Telegram Web App script -->
+    <title>Pathfinder 2E Actions</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
             background-color: #f5f5f5;
-        }
-
-        h1 {
-            color: #0088cc;
-        }
-
-        p {
-            font-size: 1.2em;
             color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            padding: 20px;
         }
 
-        #mainButton {
-            padding: 10px 20px;
-            background-color: #0088cc;
+        header {
+            width: 100%;
+            background-color: #4a90e2;
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.1em;
+            padding: 10px 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 20px;
         }
 
-        #mainButton:hover {
-            background-color: #0077bb;
+        .action-list {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .action-item {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .action-item:hover {
+            background: #f0f0f0;
+        }
+
+        .action-item:last-child {
+            border-bottom: none;
+        }
+
+        .action-details {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .action-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #4a90e2;
+        }
+
+        .action-description {
+            font-size: 1.1em;
         }
     </style>
 </head>
 <body>
-    <h1>Hello World!</h1>
-    <p>Benvenuto nella mia Mini Web App integrata in Telegram.</p>
-    <button id="mainButton">Clicca per inviare un messaggio</button>
+    <header>
+        <h1>Pathfinder 2E Actions</h1>
+    </header>
+    <div class="action-list" id="actionList">
+        <div class="action-item" data-action="attack">Attaccare</div>
+        <div class="action-item" data-action="move">Muoversi</div>
+        <div class="action-item" data-action="prepare">Preparare</div>
+        <div class="action-item" data-action="cast">Lanciare Incantesimo</div>
+        <div class="action-item" data-action="defend">Difendersi</div>
+    </div>
+    <div class="action-details" id="actionDetails">
+        <div class="action-title" id="actionTitle"></div>
+        <div class="action-description" id="actionDescription"></div>
+    </div>
 
     <script>
-        // Inizializza l'API Telegram
+        const actions = {
+            attack: {
+                title: "Attaccare",
+                description: "Effettua un attacco contro un nemico. Puoi usare diverse armi e tecniche di attacco.",
+                message: "Hai scelto di attaccare!"
+            },
+            move: {
+                title: "Muoversi",
+                description: "Puoi muoverti fino alla tua velocità di movimento in un turno.",
+                message: "Hai scelto di muoverti!"
+            },
+            prepare: {
+                title: "Preparare",
+                description: "Prepari un'azione per reagire a un evento specifico in futuro.",
+                message: "Hai scelto di preparare un'azione!"
+            },
+            cast: {
+                title: "Lanciare Incantesimo",
+                description: "Lancia un incantesimo scelto che può avere effetti variabili.",
+                message: "Hai scelto di lanciare un incantesimo!"
+            },
+            defend: {
+                title: "Difendersi",
+                description: "Assumi una posizione difensiva, aumentando la tua difesa fino al tuo prossimo turno.",
+                message: "Hai scelto di difenderti!"
+            }
+        };
+
+        document.querySelectorAll('.action-item').forEach(item => {
+            item.addEventListener('click', (event) => {
+                const actionKey = event.currentTarget.getAttribute('data-action');
+                const action = actions[actionKey];
+
+                document.getElementById('actionTitle').innerText = action.title;
+                document.getElementById('actionDescription').innerText = action.description;
+
+                // Invia il messaggio al bot di Telegram
+                window.Telegram.WebApp.sendData(action.message);
+
+                document.getElementById('actionDetails').style.display = 'block';
+            });
+        });
+
+        // Inizializza la Web App di Telegram
         const tg = window.Telegram.WebApp;
-
-
-        // Aggiungi un handler per il pulsante "Clicca per inviare un messaggio"
-        const button = document.getElementById("mainButton");
-        button.addEventListener("click", function() {
-            tg.sendData("Hello World!"); // Invia "Hello World!" al bot
-            tg.MainButton.text = "Messaggio inviato!";
-            tg.MainButton.show(); // Mostra il pulsante principale di Telegram
-        });
-
-        // Opzionale: chiudi la Mini Web App quando il pulsante principale viene cliccato
-        tg.MainButton.onClick(function() {
-            tg.close(); // Chiudi la Web App
-        });
+        tg.expand();
     </script>
 </body>
 </html>
