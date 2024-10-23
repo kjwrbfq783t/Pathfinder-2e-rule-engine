@@ -9,8 +9,8 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            background-color: #f5f5f5;
-            color: #333;
+            background-color: #212121; /* Colore simile al tema scuro di Telegram */
+            color: white;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -21,53 +21,52 @@
 
         header {
             width: 100%;
-            background-color: #4a90e2;
+            background-color: #2a9df4;
             color: white;
-            padding: 10px 20px;
+            padding: 15px;
             text-align: center;
             border-radius: 10px;
             margin-bottom: 20px;
         }
 
-        .action-list {
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Responsive grid */
+            gap: 15px;
             width: 100%;
             max-width: 600px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
         }
 
         .action-item {
-            padding: 15px;
-            border-bottom: 1px solid #e0e0e0;
+            padding: 20px;
+            background-color: #2c2c2e; /* Sfondo simile al client Telegram */
+            color: white;
+            border-radius: 10px;
+            text-align: center;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .action-item:hover {
-            background: #f0f0f0;
-        }
-
-        .action-item:last-child {
-            border-bottom: none;
+            background-color: #3c3c3e; /* Leggero cambio di colore al passaggio del mouse */
         }
 
         .action-details {
             margin-top: 20px;
             width: 100%;
             max-width: 600px;
-            background: #ffffff;
+            background: #2c2c2e;
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: white;
             display: none;
         }
 
         .action-title {
             font-size: 1.5em;
             margin-bottom: 10px;
-            color: #4a90e2;
+            color: #2a9df4;
         }
 
         .action-description {
@@ -79,7 +78,7 @@
     <header>
         <h1>Pathfinder 2E Actions</h1>
     </header>
-    <div class="action-list" id="actionList">
+    <div class="action-grid" id="actionGrid">
         <div class="action-item" data-action="attack">Attaccare</div>
         <div class="action-item" data-action="move">Muoversi</div>
         <div class="action-item" data-action="prepare">Preparare</div>
@@ -92,7 +91,6 @@
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
         const actions = {
             attack: {
                 title: "Attaccare",
@@ -130,14 +128,15 @@
                 document.getElementById('actionDescription').innerText = action.description;
 
                 // Invia il messaggio al bot di Telegram
-                tg.sendData(action.title);
+                window.Telegram.WebApp.sendData(action.message);
 
                 document.getElementById('actionDetails').style.display = 'block';
             });
         });
 
         // Inizializza la Web App di Telegram
-        
+        const tg = window.Telegram.WebApp;
+        tg.expand();
     </script>
 </body>
 </html>
