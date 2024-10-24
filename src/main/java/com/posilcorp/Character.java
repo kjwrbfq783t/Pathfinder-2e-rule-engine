@@ -5,9 +5,7 @@ import java.util.Map;
 
 import com.posilcorp.Dice.Dice;
 import com.posilcorp.Dice.DiceTray;
-import com.posilcorp.EquipmentLogic.EquipSlot;
 import com.posilcorp.EquipmentLogic.Inventory;
-import com.posilcorp.EquipmentLogic.Item;
 import com.posilcorp.EquipmentLogic.ObjectWithInventory;
 
 public abstract class Character extends ObjectYouCanSpeakTo implements ObjectWithInventory{
@@ -75,6 +73,10 @@ public abstract class Character extends ObjectYouCanSpeakTo implements ObjectWit
     public String applyDealtDamage(int damage,String dealer) throws Exception{
         hitPoints-=damage;
         return null;
+    }
+
+    public int getArmorClass(){
+        return keyAttributeModifiers.get(KeyAttribute.DEX);
     }
 
     

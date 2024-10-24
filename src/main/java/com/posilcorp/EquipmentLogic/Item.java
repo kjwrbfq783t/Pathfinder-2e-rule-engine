@@ -1,21 +1,20 @@
 package com.posilcorp.EquipmentLogic;
 
-import java.util.ArrayList;
+import com.posilcorp.IDGen;
 
 public class Item {
 
-    private static IDGen idgen=new IDGen();
     private int bulk;
     private int ID;
     private String name;
     private String description;
-    public ArrayList<EquipSlot> possible_slots;
+    protected EquipSlot slot;
     public Item(String name, String description,int bulk) {
         this.name = name;
         this.description = description;
         this.bulk=bulk;
-        possible_slots=new ArrayList<EquipSlot>();
-        ID=idgen.generate_ID();
+        slot=null;
+        ID=IDGen.generate_ID();
     }
     public int getBulk() {
         return bulk;
@@ -23,9 +22,6 @@ public class Item {
 
     public String getName() {
         return name;
-    }
-    public ArrayList<EquipSlot> getPossible_slots() {
-        return possible_slots;
     }
     public void setName(String name) {
         this.name = name;

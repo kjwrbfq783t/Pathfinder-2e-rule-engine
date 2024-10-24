@@ -1,53 +1,41 @@
 package com.posilcorp.EquipmentLogic;
 
 import java.util.ArrayList;
-import java.util.Collection;
+
 
 public class StowingItem extends Item {
-    private ArrayList<Item> items;
-    private int bulk_capacity;
+    private int bulkBonus;
+    private int bulkCapacity;
+    private ArrayList<Item> stowedItems;
+    private int totalBulk;
 
-    public StowingItem(String name, String description, int bulk,
-            int bulk_capacity) {
+    public StowingItem(String name, String description, int bulk, int bulkCapacity,
+            int bulkBonus) {
         super(name, description, bulk);
-        this.bulk_capacity = bulk_capacity;
-        possible_slots.add(EquipSlot.WEARED_BACK);
-        this.items=new ArrayList<Item>();
+        this.bulkBonus = bulkBonus;
+        this.bulkCapacity=bulkCapacity;
+        stowedItems=new ArrayList<>();
+        totalBulk=0;
     }
 
-    public void put(Item item) throws Exception {
-        if (getTotalBulk() + item.getBulk() > bulk_capacity)
-            throw new Exception("si supera il bulk massimo");
-        items.add(item);
+    public int getBulkBonus() {
+        return bulkBonus;
     }
 
-    public int getTotalBulk() {
-        int total = 0;
-        for (Item item : items) {
-            total += item.getBulk();
-        }
-        return total;
+    public void stowe(Item item) throws Exception{
+        if(totalBulk+item.getBulk()>bulkCapacity)throw new Exception("non è possibile aggiungere l'item perchè si supera la bulk capacity");
+        stowedItems.add(item);
+        totalBulk+=item.getBulk();
     }
 
-    public Item takeOut(Item item) throws Exception {
-        if (!items.contains(item)) {
-            throw new Exception("item non trovato");
-        } else {
-            items.remove(item);
-            return item;
-        }
+
+    @SuppressWarnings("unchecked")
+    public ArrayList<Item> open(){
+        return (ArrayList<Item>)stowedItems.clone();
     }
 
-    public String[] getItemNames() {
-        String[] itemNames = new String[items.size()];
-        for (int i = 0; i < items.size(); i++) {
-            itemNames[i] = items.get(i).getName();
-        }
-        return itemNames;
+    public void remove(Item item) throws Exception{
+        if(!stowedItems.remove(item)) throw new Exception("l'oggetto non si trova in questo container");
     }
-
-    public Collection<Item> getAll() {
-        return items;
-    }
-
+    
 }

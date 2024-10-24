@@ -5,138 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pathfinder 2E Actions</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: #212121; /* Colore simile al tema scuro di Telegram */
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            height: 100vh;
-            padding: 20px;
-        }
+    <div id="output"></div>
 
-        header {
-            width: 100%;
-            background-color: #2a9df4;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .action-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Responsive grid */
-            gap: 15px;
-            width: 100%;
-            max-width: 600px;
-        }
-
-        .action-item {
-            padding: 20px;
-            background-color: #2c2c2e; /* Sfondo simile al client Telegram */
-            color: white;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .action-item:hover {
-            background-color: #3c3c3e; /* Leggero cambio di colore al passaggio del mouse */
-        }
-
-        .action-details {
-            margin-top: 20px;
-            width: 100%;
-            max-width: 600px;
-            background: #2c2c2e;
-            border-radius: 10px;
-            padding: 20px;
-            color: white;
-            display: none;
-        }
-
-        .action-title {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-            color: #2a9df4;
-        }
-
-        .action-description {
-            font-size: 1.1em;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>Pathfinder 2E Actions</h1>
-    </header>
-    <div class="action-grid" id="actionGrid">
-        <div class="action-item" data-action="attack">Attaccare</div>
-        <div class="action-item" data-action="move">Muoversi</div>
-        <div class="action-item" data-action="prepare">Preparare</div>
-        <div class="action-item" data-action="cast">Lanciare Incantesimo</div>
-        <div class="action-item" data-action="defend">Difendersi</div>
-    </div>
-    <div class="action-details" id="actionDetails">
-        <div class="action-title" id="actionTitle"></div>
-        <div class="action-description" id="actionDescription"></div>
-    </div>
-
+    <!-- Inclusione dello script JavaScript -->
     <script>
-        const actions = {
-            attack: {
-                title: "Attaccare",
-                description: "Effettua un attacco contro un nemico. Puoi usare diverse armi e tecniche di attacco.",
-                message: "Hai scelto di attaccare!"
-            },
-            move: {
-                title: "Muoversi",
-                description: "Puoi muoverti fino alla tua velocità di movimento in un turno.",
-                message: "Hai scelto di muoverti!"
-            },
-            prepare: {
-                title: "Preparare",
-                description: "Prepari un'azione per reagire a un evento specifico in futuro.",
-                message: "Hai scelto di preparare un'azione!"
-            },
-            cast: {
-                title: "Lanciare Incantesimo",
-                description: "Lancia un incantesimo scelto che può avere effetti variabili.",
-                message: "Hai scelto di lanciare un incantesimo!"
-            },
-            defend: {
-                title: "Difendersi",
-                description: "Assumi una posizione difensiva, aumentando la tua difesa fino al tuo prossimo turno.",
-                message: "Hai scelto di difenderti!"
-            }
-        };
-
-        document.querySelectorAll('.action-item').forEach(item => {
-            item.addEventListener('click', (event) => {
-                const actionKey = event.currentTarget.getAttribute('data-action');
-                const action = actions[actionKey];
-
-                document.getElementById('actionTitle').innerText = action.title;
-                document.getElementById('actionDescription').innerText = action.description;
-
-                // Invia il messaggio al bot di Telegram
-                window.Telegram.WebApp.sendData(action.message);
-
-                document.getElementById('actionDetails').style.display = 'block';
-            });
-        });
+        // Definizione dell'oggetto JavaScript
 
         // Inizializza la Web App di Telegram
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        const tg = window.Telegram.WebApp; 
+        // Recupera l'elemento HTML con id "output"
+        const outputDiv = document.getElementById('output');
+
+        // Inserisce la stringa contenuta nell'oggetto nell'elemento HTML
+        outputDiv.textContent = tg.initData;
     </script>
+
+
+ 
 </body>
 </html>

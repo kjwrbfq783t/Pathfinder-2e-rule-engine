@@ -13,8 +13,7 @@ public class WeaponItem extends Item{
         super(name, description, bulk);
         this.diceMultiplier=diceMultiplier;
         this.diceType=diceType;
-        this.damageType=damageType;
-        possible_slots.add(EquipSlot.WEAPON_SLOTS);
+        this.damageType=damageType;        
     }
 
     public int getBaseDamage(){
